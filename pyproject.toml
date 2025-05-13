@@ -1,0 +1,17 @@
+[project]
+name = "modbus-mcp"
+version = "0.1.0"
+description = "A Model Context Protocol (MCP) server for Modbus"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastmcp>=2.3.3",
+    "pymodbus>=3.9.2",
+]
+
+[project.scripts]
+modbus-mcp = "modbus_mcp:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
