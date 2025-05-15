@@ -15,3 +15,10 @@ modbus-mcp = "modbus_mcp:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pylint>=3.3.7",
+    "pytest>=8.3.5",
+    "trio>=0.30.0",
+]
