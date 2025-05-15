@@ -18,6 +18,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "black>=25.1.0",
     "pylint>=3.3.7",
     "pytest>=8.3.5",
     "trio>=0.30.0",
