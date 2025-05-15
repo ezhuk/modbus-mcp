@@ -1,158 +1,97 @@
-import asyncio
-from contextlib import asynccontextmanager
+"""A lightweigth MCP server for the Modbus protocol."""
+
 from dataclasses import dataclass
 
-from fastmcp import FastMCP, Context
+from fastmcp import FastMCP
 from fastmcp.prompts.prompt import Message
 from pymodbus.client import AsyncModbusTcpClient
 
 @dataclass
-class AppContext:
-    client: AsyncModbusTcpClient
+class Modbus:
+    """Default Modbus connection settings."""
+    HOST="127.0.0.1"
+    PORT=502
+    UNIT=1
 
-@asynccontextmanager
-async def lifespan(server: FastMCP):
-    client = AsyncModbusTcpClient("127.0.0.1")
-    await client.connect()
+_READ_FN={
+    0: ("read_coils", 1),
+    1: ("read_discrete_inputs", 10001),
+    3: ("read_input_registers", 30001),
+    4: ("read_holding_registers", 40001)
+}
+
+_WRITE_FN={
+    0: ("write_coils", 1),
+    4: ("write_registers", 40001)
+}
+
+mcp = FastMCP(name="Modbus MCP Server")
+
+@mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
+async def read_registers(
+    host: str = Modbus.HOST,
+    port: int = Modbus.PORT,
+    address: int = 1,
+    count: int = 1,
+    unit: int = 1
+) -> int | list[int]:
+    """Reads the contents of one or more registers on a remote unit."""
+    client = AsyncModbusTcpClient(host, port=port)
     try:
-        yield AppContext(client=client)
+        await client.connect()
+        func, offset = _READ_FN[address//10000]
+        method = getattr(client, func)
+        res = await method(address - offset, count=count, slave=unit)
+        out = getattr(res, "registers", None) or getattr(res, "bits", None)
+        return [int(x) for x in out] if count > 1 else out[0]
     except Exception as e:
-        print(f"ERROR: {e}")
+        raise RuntimeError(f"Could not read {address} ({count}) from {host}:{port}") from e
     finally:
-        if client.connected:
-            await client.close()
-
-mcp = FastMCP(
-    name="Modbus MCP Server",
-    lifespan=lifespan
-)
-
-@mcp.resource("modbus://{unit}/{type}/{address}")
-async def read_one(
-    ctx: Context,
-    unit: int,
-    type: str,
-    address: int
-) -> int | bool:
-    client: AsyncModbusTcpClient = ctx.request_context.lifespan_context.client
-    if type == "holding":
-        r = await client.read_holding_registers(address, count=1, unit=unit)
-        return r.registers[0]
-    elif type == "input":
-        r = await client.read_input_registers(address, count=1, unit=unit)
-        return r.registers[0]
-    elif type == "coil":
-        r = await client.read_coils(address, count=1, unit=unit)
-        return r.bits[0]
-    elif type == "discrete":
-        r = await client.read_discrete_inputs(address, count=1, unit=unit)
-        return r.bits[0]
-    else:
-        raise RuntimeError(f"Unsupported register type: '{type}'")
-
-@mcp.resource("modbus://{unit}/{type}?start={start}&count={count}")
-async def read_many(
-    ctx: Context,
-    unit: int,
-    type: str,
-    start: int,
-    count: int
-) -> list[int | bool]:
-    client: AsyncModbusTcpClient = ctx.request_context.lifespan_context.client
-    if type == "holding":
-        r = await client.read_holding_registers(start, count=count, unit=unit)
-        return r.registers
-    elif type == "input":
-        r = await client.read_input_registers(start, count=count, unit=unit)
-        return r.registers
-    elif type == "coil":
-        r = await client.read_coils(start, count=count, unit=unit)
-        return r.bits
-    elif type == "discrete":
-        r = await client.read_discrete_inputs(start, count=count, unit=unit)
-        return r.bits
-    else:
-        raise RuntimeError(f"Unsupported register type: '{type}'")
+        client.close()
 
 @mcp.tool()
-async def write_one(
-    ctx: Context,
-    unit: int,
-    type: str,
-    address: int,
-    value: int | bool
-) -> None:
-    client: AsyncModbusTcpClient = ctx.request_context.lifespan_context.client
-    if type in ("holding", "input"):
-        await client.write_register(address, value, unit=unit)
-    elif type == "coil":
-        await client.write_coil(address, value, unit=unit)
-    else:
-        raise RuntimeError(f"Type '{type}' does not support single-write")
-
-@mcp.tool()
-async def write_many(
-    ctx: Context,
-    unit: int,
-    type: str,
-    start: int,
-    values: list[int | bool]
-) -> None:
-    client: AsyncModbusTcpClient = ctx.request_context.lifespan_context.client
-    if type in ("holding", "input"):
-        await client.write_registers(start, values, unit=unit)
-    elif type == "coil":
-        await client.write_coils(start, values, unit=unit)
-    else:
-        raise RuntimeError(f"Type '{type}' does not support multi-write")
+async def write_registers(
+    data: list[int],
+    host: str = Modbus.HOST,
+    port: int = Modbus.PORT,
+    address: int = 1,
+    unit: int = 1
+) -> str:
+    """ Writes data to one or more registers on a remote unit."""
+    client = AsyncModbusTcpClient(host, port=port)
+    try:
+        await client.connect()
+        func, offset = _WRITE_FN[address//10000]
+        method = getattr(client, func)
+        res = await method(address - offset, data, slave=unit)
+        if res.isError():
+            raise RuntimeError(f"Could not write to {address} on {host}:{port}")
+        return f"Write to {address} on {host}:{port} has succedeed"
+    except Exception as e:
+        raise RuntimeError(f"{e}") from e
+    finally:
+        client.close()
 
 @mcp.prompt(
-    name="clarify_modbus_read",
-    description="Ask the user to specify missing Modbus read parameters",
-    tags={"modbus", "read"}
+    name="modbus_help",
+    tags={"modbus", "help"}
 )
-
-def clarify_modbus_read(
-    unit: int | None = None,
-    type: str | None = None,
-    address: int | None = None,
-    start: int | None = None,
-    count: int | None = None
-) -> list[Message]:
-    prompts: list[Message] = []
-    if unit is None:
-        prompts.append(Message("Please specify the Modbus unit ID you want to read from."))
-    if type is None:
-        prompts.append(Message("Which register type do you want to read from? Choose from 'holding', 'input', 'coil', or 'discrete'."))
-    if address is None and (start is None or count is None):
-        prompts.append(
-            Message(
-                "To read a single register/coil, provide `address`."
-                "To read multiple, provide both `start` and `count`."
-            )
-        )
-    return prompts
+def modbus_help() -> list[Message]:
+    """Provides examples of how to use the Modbus MCP server."""
+    return [
+        Message("Here are examples of how to read and write registers:"),
+        Message(" - tcp://127.0.0.1:502/40001?unit=1"),
+        Message(" - tcp://192.168.1.1/30010?count=10"),
+        Message(" - tool write_registers address=40005 data=[12, 34] unit=1")
+    ]
 
 @mcp.prompt(
-    name="clarify_modbus_write",
-    description="Ask the user to specify missing Modbus write parameters",
-    tags={"modbus", "write"}
+    name="modbus_error",
+    tags={"modbus", "error"}
 )
-def clarify_modbus_write(
-    unit: int | None = None,
-    type: str | None = None,
-    address: int | None = None,
-    start: int | None = None,
-    values: list[int | bool] | None = None
-) -> list[Message]:
-    prompts: list[Message] = []
-    if unit is None:
-        prompts.append(Message("Please specify the Modbus unit ID you want to write to."))
-    if type is None:
-        prompts.append(Message("Which register type do you want to write? 'holding' or 'coil'."))
-    if address is None and start is None:
-        prompts.append(Message("For a single write, provide `address` and `value`. For a bulk write, provide `start` and `values` list."))
-    if values is None:
-        prompts.append(Message("Please provide the value (or list of values) you wish to write."))
-    return prompts
-
+def modbus_error(error: str | None = None) -> list[Message]:
+    """Asks the user how to handle an error."""
+    return [
+        Message(f"ERROR: {error!r}"),
+        Message("Would you like to retry, change parameters, or abort?")
+    ] if error else []
