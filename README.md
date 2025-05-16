@@ -1,6 +1,6 @@
 ## Modbus MCP Server
 
-A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that connects LLM agents to Modbus devices in a secure, standardized way, enabling seamless integration of AI-driven workflows with Building Automation (BAS) and Industrial Control (ICS) systems, allowing agents to monitor real-time sensor data, actuate devices, and orchestrate complex automation tasks.
+A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that connects LLM agents to [Modbus](https://en.wikipedia.org/wiki/Modbus) devices in a secure, standardized way, enabling seamless integration of AI-driven workflows with Building Automation (BAS) and Industrial Control (ICS) systems, allowing agents to monitor real-time sensor data, actuate devices, and orchestrate complex automation tasks.
 
 [![test](https://github.com/ezhuk/modbus-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/ezhuk/modbus-mcp/actions/workflows/test.yml)
 
@@ -12,7 +12,7 @@ The server is built with [FastMCP 2.0](https://gofastmcp.com/getting-started/wel
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Clone the repository and use `uv` to install project dependencies and create a virtual environment.
+Clone the repository, then use `uv` to install project dependencies and create a virtual environment.
 
 ```bash
 git clone https://github.com/ezhuk/modbus-mcp.git
@@ -20,21 +20,78 @@ cd modbus-cmp
 uv sync
 ```
 
-Run the Modbus MCP server from the command line as follows. By default, it uses the Streamable HTTP transport on port `8000`.
+Start the Modbus MCP server by running the following command in yor terminal. It defaults to using the `Streamable HTTP` transport on port `8000`.
 
 ```bash
 uv run modbus-mcp
 ```
 
-To confirm the server is up and running and explore available resources and tools, run the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector), go to `http://127.0.0.1:6274/` in your browser and connect it to the Modbus MCP server at `http://127.0.0.1:8000/mcp/`.
+To confirm the server is up and running and explore available resources and tools, run the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector) and connect it to the Modbus MCP server at `http://127.0.0.1:8000/mcp/`. Make sure to set the transport to `Streamable HTTP`.
 
 ```bash
 npx @modelcontextprotocol/inspector
 ```
 
+![s01](https://github.com/user-attachments/assets/e3673921-0396-4561-8640-884e9cef609a)
+
+
 ## Core Concepts
 
-TBD
+The Modbus MCP server leverages FastMCP 2.0's core building blocks - resource templates, tools, and prompts - to streamline Modbus read and write operations with minimal boilerplate and a clean, Pythonic interface.
+
+### Read Registers
+
+Each register on a device is mapped to a resource and [resource templates](https://gofastmcp.com/servers/resources#resource-templates) are used to specify connection details (host, port, unit) and read parameters (address, count).
+
+```python
+@mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
+async def read_registers(
+    host: str = Modbus.HOST,
+    port: int = Modbus.PORT,
+    address: int = 1,
+    count: int = 1,
+    unit: int = Modbus.UNIT,
+) -> int | list[int]:
+    """Reads the contents of one or more registers on a remote unit."""
+    ...
+```
+
+### Write Registers
+
+Write operations are exposed as a [tool](https://gofastmcp.com/servers/tools), accepting the same connection details (host, port, unit) and allowing to set the contents of one or more `holding registers` or `coils` in a single, atomic call.
+
+```python
+@mcp.tool()
+async def write_registers(
+    data: list[int],
+    host: str = Modbus.HOST,
+    port: int = Modbus.PORT,
+    address: int = 1,
+    unit: int = Modbus.UNIT,
+) -> str:
+    """Writes data to one or more registers on a remote unit."""
+    ...
+```
+
+### Interactive Prompts
+
+Structured response messages are implemented using [prompts](https://gofastmcp.com/servers/prompts) that help guide the interaction, clarify missing parameters, and handle errors gracefully.
+
+```python
+@mcp.prompt(name="modbus_help", tags={"modbus", "help"})
+def modbus_help() -> list[Message]:
+    """Provides examples of how to use the Modbus MCP server."""
+    ...
+```
+
+Here are some example text inputs that can be used to interact with the server.
+
+```text
+Please read the value of register 40001 on 127.0.0.1:502.
+Set register 40005 to 123 on host 192.168.1.10, unit 3.
+Write [1, 2, 3] to holding registers starting at address 40010.
+What is the status of input register 30010 on 10.0.0.5?
+```
 
 ## License
 
