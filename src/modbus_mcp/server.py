@@ -34,7 +34,7 @@ async def read_registers(
     port: int = Modbus.PORT,
     address: int = 1,
     count: int = 1,
-    unit: int = 1,
+    unit: int = Modbus.UNIT,
 ) -> int | list[int]:
     """Reads the contents of one or more registers on a remote unit."""
     client = AsyncModbusTcpClient(host, port=port)
@@ -59,7 +59,7 @@ async def write_registers(
     host: str = Modbus.HOST,
     port: int = Modbus.PORT,
     address: int = 1,
-    unit: int = 1,
+    unit: int = Modbus.UNIT,
 ) -> str:
     """Writes data to one or more registers on a remote unit."""
     client = AsyncModbusTcpClient(host, port=port)
