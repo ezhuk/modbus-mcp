@@ -75,7 +75,7 @@ async def test_write_registers(patch_modbus_client):
 async def test_help_prompt():
     async with Client(mcp) as client:
         result = await client.get_prompt("modbus_help", {})
-        assert len(result.messages) == 4
+        assert len(result.messages) == 5
 
 @pytest.mark.anyio
 async def test_error_prompt():

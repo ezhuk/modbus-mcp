@@ -82,9 +82,10 @@ def modbus_help() -> list[Message]:
     """Provides examples of how to use the Modbus MCP server."""
     return [
         Message("Here are examples of how to read and write registers:"),
-        Message(" - tcp://127.0.0.1:502/40001?unit=1"),
-        Message(" - tcp://192.168.1.1/30010?count=10"),
-        Message(" - tool write_registers address=40005 data=[12, 34] unit=1"),
+        Message("Please read the value of register 40001 on 127.0.0.1:502."),
+        Message("Set register 40005 to 123 on host 192.168.1.10, unit 3."),
+        Message("Write [1, 2, 3] to holding registers starting at address 40010."),
+        Message("What is the status of input register 30010 on 10.0.0.5?"),
     ]
 
 

@@ -20,7 +20,7 @@ cd modbus-cmp
 uv sync
 ```
 
-Start the Modbus MCP server by running the following command in yor terminal. It defaults to using the `Streamable HTTP` transport on port `8000`.
+Start the Modbus MCP server by running the following command in your terminal. It defaults to using the `Streamable HTTP` transport on port `8000`.
 
 ```bash
 uv run modbus-mcp
