@@ -55,6 +55,7 @@ async def test_read_registers(patch_modbus_client):
             AnyUrl("tcp://127.0.0.1:502/40010?count=1&unit=1")
         )
         assert len(result) == 1
+        assert result[0].text == '9'
 
 @pytest.mark.anyio
 async def test_write_registers(patch_modbus_client):
@@ -70,6 +71,7 @@ async def test_write_registers(patch_modbus_client):
             }
         )
         assert len(result) == 1
+        assert "succedeed" in result[0].text
 
 @pytest.mark.anyio
 async def test_help_prompt():

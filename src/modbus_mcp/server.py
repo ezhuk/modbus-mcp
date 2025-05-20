@@ -7,7 +7,7 @@ from fastmcp.prompts.prompt import Message
 from pymodbus.client import AsyncModbusTcpClient
 
 
-@dataclass
+@dataclass(frozen=True)
 class Modbus:
     """Default Modbus connection settings."""
 
