@@ -29,6 +29,7 @@ mcp = FastMCP(name="Modbus MCP Server")
 
 
 @mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
+@mcp.tool()
 async def read_registers(
     host: str = Modbus.HOST,
     port: int = Modbus.PORT,

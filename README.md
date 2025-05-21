@@ -41,10 +41,11 @@ The Modbus MCP server leverages FastMCP 2.0's core building blocks - resource te
 
 ### Read Registers
 
-Each register on a device is mapped to a resource and [resource templates](https://gofastmcp.com/servers/resources#resource-templates) are used to specify connection details (host, port, unit) and read parameters (address, count).
+Each register on a device is mapped to a resource (and exposed as a tool) and [resource templates](https://gofastmcp.com/servers/resources#resource-templates) are used to specify connection details (host, port, unit) and read parameters (address, count).
 
 ```python
 @mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
+@mcp.tool()
 async def read_registers(
     host: str = Modbus.HOST,
     port: int = Modbus.PORT,
