@@ -16,7 +16,7 @@ Clone the repository, then use `uv` to install project dependencies and create a
 
 ```bash
 git clone https://github.com/ezhuk/modbus-mcp.git
-cd modbus-cmp
+cd modbus-mcp
 uv sync
 ```
 
