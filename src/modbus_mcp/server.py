@@ -29,7 +29,9 @@ mcp = FastMCP(name="Modbus MCP Server")
 
 
 @mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
-@mcp.tool()
+@mcp.tool(
+    annotations={"title": "Read Registers", "readOnlyHint": True, "openWorldHint": True}
+)
 async def read_registers(
     host: str = Modbus.HOST,
     port: int = Modbus.PORT,
@@ -54,7 +56,13 @@ async def read_registers(
         client.close()
 
 
-@mcp.tool()
+@mcp.tool(
+    annotations={
+        "title": "Write Registers",
+        "readOnlyHint": False,
+        "openWorldHint": True,
+    }
+)
 async def write_registers(
     data: list[int],
     host: str = Modbus.HOST,
@@ -72,6 +80,37 @@ async def write_registers(
         if res.isError():
             raise RuntimeError(f"Could not write to {address} on {host}:{port}")
         return f"Write to {address} on {host}:{port} has succedeed"
+    except Exception as e:
+        raise RuntimeError(f"{e}") from e
+    finally:
+        client.close()
+
+
+@mcp.tool(
+    annotations={
+        "title": "Mask Write Register",
+        "readOnlyHint": False,
+        "openWorldHint": True,
+    }
+)
+async def mask_write_register(
+    host: str = Modbus.HOST,
+    port: int = Modbus.PORT,
+    address: int = 40001,
+    and_mask: int = 0xFFFF,
+    or_mask: int = 0x0000,
+    unit: int = Modbus.UNIT,
+) -> str:
+    """Mask writes data to a specified register."""
+    client = AsyncModbusTcpClient(host, port=port)
+    try:
+        await client.connect()
+        res = await client.mask_write_register(
+            address - 40001, and_mask, or_mask, slave=unit
+        )
+        if res.isError():
+            raise RuntimeError(f"Could not mask write to {address} on {host}:{port}")
+        return f"Mask write to {address} on {host}:{port} has succedeed"
     except Exception as e:
         raise RuntimeError(f"{e}") from e
     finally:

@@ -54,11 +54,15 @@ def patch_modbus_client(monkeypatch):
             print(f"write_registers: {addr}, {values}, {slave}")
             return MockResponse(error=False)
 
+        async def mask_write_register(self, addr, and_mask, or_mask, slave):
+            print(f"mask_write_register: {addr}, {and_mask}, {or_mask}, {slave}")
+            return MockResponse(error=False)
+
     monkeypatch.setattr(server_module, "AsyncModbusTcpClient", MockClient)
     return []
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_read_registers(patch_modbus_client):
     """Test read_registers resource."""
     async with Client(mcp) as client:
@@ -69,7 +73,7 @@ async def test_read_registers(patch_modbus_client):
         assert result[0].text == "9"
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_write_registers(patch_modbus_client):
     """Test write_registers tool."""
     async with Client(mcp) as client:
@@ -87,7 +91,26 @@ async def test_write_registers(patch_modbus_client):
         assert "succedeed" in result[0].text
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
+async def test_mask_write_registers(patch_modbus_client):
+    """Test mask_write_registers tool."""
+    async with Client(mcp) as client:
+        result = await client.call_tool(
+            "mask_write_register",
+            {
+                "host": "127.0.0.1",
+                "port": 502,
+                "address": 40001,
+                "and_mask": 0xFFFF,
+                "or_mask": 0x0000,
+                "unit": 1,
+            },
+        )
+        assert len(result) == 1
+        assert "succedeed" in result[0].text
+
+
+@pytest.mark.asyncio
 async def test_help_prompt():
     """Test help prompt."""
     async with Client(mcp) as client:
@@ -95,7 +118,7 @@ async def test_help_prompt():
         assert len(result.messages) == 5
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_error_prompt():
     """Test error prompt."""
     async with Client(mcp) as client:
