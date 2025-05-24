@@ -58,7 +58,7 @@ def patch_modbus_client(monkeypatch):
     return []
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_read_registers(patch_modbus_client):
     """Test read_registers resource."""
     async with Client(mcp) as client:
@@ -69,7 +69,7 @@ async def test_read_registers(patch_modbus_client):
         assert result[0].text == "9"
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_write_registers(patch_modbus_client):
     """Test write_registers tool."""
     async with Client(mcp) as client:
@@ -87,7 +87,7 @@ async def test_write_registers(patch_modbus_client):
         assert "succedeed" in result[0].text
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_help_prompt():
     """Test help prompt."""
     async with Client(mcp) as client:
@@ -95,7 +95,7 @@ async def test_help_prompt():
         assert len(result.messages) == 5
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_error_prompt():
     """Test error prompt."""
     async with Client(mcp) as client:
