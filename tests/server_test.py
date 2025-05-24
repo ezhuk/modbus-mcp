@@ -38,6 +38,13 @@ def patch_modbus_client(monkeypatch):
         def close(self):
             pass
 
+        async def __aenter__(self):
+            await self.connect()
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            self.close()
+
         async def read_coils(self, addr, count, slave):
             print(f"read_coils: {addr}, {count}, {slave}")
             return MockResponse(bits=[((addr + i) % 2 == 0) for i in range(count)])
