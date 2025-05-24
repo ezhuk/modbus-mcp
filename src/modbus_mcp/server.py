@@ -40,20 +40,17 @@ async def read_registers(
     unit: int = Modbus.UNIT,
 ) -> int | list[int]:
     """Reads the contents of one or more registers on a remote unit."""
-    client = AsyncModbusTcpClient(host, port=port)
     try:
-        await client.connect()
-        func, offset = _READ_FN[address // 10000]
-        method = getattr(client, func)
-        res = await method(address - offset, count=count, slave=unit)
-        out = getattr(res, "registers", None) or getattr(res, "bits", None)
-        return [int(x) for x in out] if count > 1 else out[0]
+        async with AsyncModbusTcpClient(host, port=port) as client:
+            func, offset = _READ_FN[address // 10000]
+            method = getattr(client, func)
+            res = await method(address - offset, count=count, slave=unit)
+            out = getattr(res, "registers", None) or getattr(res, "bits", None)
+            return [int(x) for x in out] if count > 1 else out[0]
     except Exception as e:
         raise RuntimeError(
             f"Could not read {address} ({count}) from {host}:{port}"
         ) from e
-    finally:
-        client.close()
 
 
 @mcp.tool(
@@ -71,19 +68,16 @@ async def write_registers(
     unit: int = Modbus.UNIT,
 ) -> str:
     """Writes data to one or more registers on a remote unit."""
-    client = AsyncModbusTcpClient(host, port=port)
     try:
-        await client.connect()
-        func, offset = _WRITE_FN[address // 10000]
-        method = getattr(client, func)
-        res = await method(address - offset, data, slave=unit)
-        if res.isError():
-            raise RuntimeError(f"Could not write to {address} on {host}:{port}")
-        return f"Write to {address} on {host}:{port} has succedeed"
+        async with AsyncModbusTcpClient(host, port=port) as client:
+            func, offset = _WRITE_FN[address // 10000]
+            method = getattr(client, func)
+            res = await method(address - offset, data, slave=unit)
+            if res.isError():
+                raise RuntimeError(f"Could not write to {address} on {host}:{port}")
+            return f"Write to {address} on {host}:{port} has succedeed"
     except Exception as e:
         raise RuntimeError(f"{e}") from e
-    finally:
-        client.close()
 
 
 @mcp.tool(
@@ -102,19 +96,18 @@ async def mask_write_register(
     unit: int = Modbus.UNIT,
 ) -> str:
     """Mask writes data to a specified register."""
-    client = AsyncModbusTcpClient(host, port=port)
     try:
-        await client.connect()
-        res = await client.mask_write_register(
-            address - 40001, and_mask, or_mask, slave=unit
-        )
-        if res.isError():
-            raise RuntimeError(f"Could not mask write to {address} on {host}:{port}")
-        return f"Mask write to {address} on {host}:{port} has succedeed"
+        async with AsyncModbusTcpClient(host, port=port) as client:
+            res = await client.mask_write_register(
+                address - 40001, and_mask, or_mask, slave=unit
+            )
+            if res.isError():
+                raise RuntimeError(
+                    f"Could not mask write to {address} on {host}:{port}"
+                )
+            return f"Mask write to {address} on {host}:{port} has succedeed"
     except Exception as e:
         raise RuntimeError(f"{e}") from e
-    finally:
-        client.close()
 
 
 @mcp.prompt(name="modbus_help", tags={"modbus", "help"})
