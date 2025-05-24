@@ -1,11 +1,11 @@
 [project]
 name = "modbus-mcp"
-version = "0.1.9"
+version = "0.1.10"
 description = "A Model Context Protocol (MCP) server for Modbus"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastmcp>=2.3.3",
+    "fastmcp>=2.5.1",
     "pymodbus>=3.9.2",
 ]
 
