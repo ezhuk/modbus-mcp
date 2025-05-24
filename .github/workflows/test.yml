@@ -24,5 +24,6 @@ jobs:
           python -m pip install wheel
           pip install uv
           uv sync
+          uv run black src
+          uv run ruff check src
           uv run pytest
-          uv run pylint src
