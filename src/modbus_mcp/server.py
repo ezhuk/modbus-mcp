@@ -29,7 +29,9 @@ mcp = FastMCP(name="Modbus MCP Server")
 
 
 @mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
-@mcp.tool()
+@mcp.tool(
+    annotations={"title": "Read Registers", "readOnlyHint": True, "openWorldHint": True}
+)
 async def read_registers(
     host: str = Modbus.HOST,
     port: int = Modbus.PORT,
@@ -54,7 +56,13 @@ async def read_registers(
         client.close()
 
 
-@mcp.tool()
+@mcp.tool(
+    annotations={
+        "title": "Write Registers",
+        "readOnlyHint": False,
+        "openWorldHint": True,
+    }
+)
 async def write_registers(
     data: list[int],
     host: str = Modbus.HOST,
