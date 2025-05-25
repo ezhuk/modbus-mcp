@@ -21,7 +21,7 @@ async def server_main() -> None:
         ir=ModbusSequentialDataBlock(0, list(range(0, count))),
     )
     context = ModbusServerContext(slaves=store, single=True)
-    await StartAsyncTcpServer(context, address=("0.0.0.0", 502))
+    await StartAsyncTcpServer(context, address=("127.0.0.1", 5020))
 
 
 def thread_main():
