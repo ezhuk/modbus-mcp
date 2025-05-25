@@ -1,20 +1,24 @@
 """A lightweigth MCP server for the Modbus protocol."""
 
-from dataclasses import dataclass
-
 from fastmcp import FastMCP
 from fastmcp.prompts.prompt import Message
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pymodbus.client import AsyncModbusTcpClient
 
 
-@dataclass(frozen=True)
-class Modbus:
-    """Default Modbus connection settings."""
+class Modbus(BaseModel):
+    HOST: str = "127.0.0.1"
+    PORT: int = 502
+    UNIT: int = 1
 
-    HOST = "127.0.0.1"
-    PORT = 502
-    UNIT = 1
 
+class Settings(BaseSettings):
+    modbus: Modbus = Modbus()
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+
+settings = Settings()
 
 _READ_FN = {
     0: ("read_coils", 1),
@@ -33,11 +37,11 @@ mcp = FastMCP(name="Modbus MCP Server")
     annotations={"title": "Read Registers", "readOnlyHint": True, "openWorldHint": True}
 )
 async def read_registers(
-    host: str = Modbus.HOST,
-    port: int = Modbus.PORT,
+    host: str = settings.modbus.HOST,
+    port: int = settings.modbus.PORT,
     address: int = 1,
     count: int = 1,
-    unit: int = Modbus.UNIT,
+    unit: int = settings.modbus.UNIT,
 ) -> int | list[int]:
     """Reads the contents of one or more registers on a remote unit."""
     try:
@@ -62,10 +66,10 @@ async def read_registers(
 )
 async def write_registers(
     data: list[int],
-    host: str = Modbus.HOST,
-    port: int = Modbus.PORT,
+    host: str = settings.modbus.HOST,
+    port: int = settings.modbus.PORT,
     address: int = 1,
-    unit: int = Modbus.UNIT,
+    unit: int = settings.modbus.UNIT,
 ) -> str:
     """Writes data to one or more registers on a remote unit."""
     try:
@@ -88,12 +92,12 @@ async def write_registers(
     }
 )
 async def mask_write_register(
-    host: str = Modbus.HOST,
-    port: int = Modbus.PORT,
+    host: str = settings.modbus.HOST,
+    port: int = settings.modbus.PORT,
     address: int = 40001,
     and_mask: int = 0xFFFF,
     or_mask: int = 0x0000,
-    unit: int = Modbus.UNIT,
+    unit: int = settings.modbus.UNIT,
 ) -> str:
     """Mask writes data to a specified register."""
     try:
