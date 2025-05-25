@@ -103,7 +103,10 @@ async def mask_write_register(
     try:
         async with AsyncModbusTcpClient(host, port=port) as client:
             res = await client.mask_write_register(
-                address - 40001, and_mask, or_mask, slave=unit
+                address=(address - 40001),
+                and_mask=and_mask,
+                or_mask=or_mask,
+                slave=unit,
             )
             if res.isError():
                 raise RuntimeError(
