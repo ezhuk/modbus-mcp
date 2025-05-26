@@ -47,11 +47,11 @@ Each register on a device is mapped to a resource (and exposed as a tool) and [r
 @mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
 @mcp.tool()
 async def read_registers(
-    host: str = Modbus.HOST,
-    port: int = Modbus.PORT,
+    host: str = settings.Modbus.HOST,
+    port: int = settings.Modbus.PORT,
     address: int = 1,
     count: int = 1,
-    unit: int = Modbus.UNIT,
+    unit: int = settings.Modbus.UNIT,
 ) -> int | list[int]:
     """Reads the contents of one or more registers on a remote unit."""
     ...
@@ -65,10 +65,10 @@ Write operations are exposed as a [tool](https://gofastmcp.com/servers/tools), a
 @mcp.tool()
 async def write_registers(
     data: list[int],
-    host: str = Modbus.HOST,
-    port: int = Modbus.PORT,
+    host: str = settings.Modbus.HOST,
+    port: int = settings.Modbus.PORT,
     address: int = 1,
-    unit: int = Modbus.UNIT,
+    unit: int = settings.Modbus.UNIT,
 ) -> str:
     """Writes data to one or more registers on a remote unit."""
     ...
@@ -93,6 +93,13 @@ Set register 40005 to 123 on host 192.168.1.10, unit 3.
 Write [1, 2, 3] to holding registers starting at address 40010.
 What is the status of input register 30010 on 10.0.0.5?
 ```
+
+## Examples
+
+The `examples` folder contains sample projects showing how to integrate with the Modbus MCP server using various client APIs to provide tools and context to LLMs.
+
+- [openai-agents](https://github.com/ezhuk/bacnet-mcp/tree/main/examples/openai-agents) - shows how to connect to the Modbus MCP server using the [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/mcp/).
+- [openai](https://github.com/ezhuk/bacnet-mcp/tree/main/examples/openai) - a minimal app leveraging remote MCP server support in the [OpenAI Python library](https://platform.openai.com/docs/guides/tools-remote-mcp).
 
 ## License
 
