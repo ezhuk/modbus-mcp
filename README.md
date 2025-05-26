@@ -98,8 +98,8 @@ What is the status of input register 30010 on 10.0.0.5?
 
 The `examples` folder contains sample projects showing how to integrate with the Modbus MCP server using various client APIs to provide tools and context to LLMs.
 
-- [openai-agents](https://github.com/ezhuk/bacnet-mcp/tree/main/examples/openai-agents) - shows how to connect to the Modbus MCP server using the [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/mcp/).
-- [openai](https://github.com/ezhuk/bacnet-mcp/tree/main/examples/openai) - a minimal app leveraging remote MCP server support in the [OpenAI Python library](https://platform.openai.com/docs/guides/tools-remote-mcp).
+- [openai-agents](https://github.com/ezhuk/modbus-mcp/tree/main/examples/openai-agents) - shows how to connect to the Modbus MCP server using the [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/mcp/).
+- [openai](https://github.com/ezhuk/modbus-mcp/tree/main/examples/openai) - a minimal app leveraging remote MCP server support in the [OpenAI Python library](https://platform.openai.com/docs/guides/tools-remote-mcp).
 
 ## License
 
