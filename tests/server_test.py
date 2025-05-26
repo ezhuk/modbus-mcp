@@ -9,25 +9,25 @@ from modbus_mcp.server import mcp
 
 
 @pytest.mark.asyncio
-async def test_read_registers(modbus_server):
+async def test_read_registers(server):
     """Test read_registers resource."""
     async with Client(mcp) as client:
         result = await client.read_resource(
-            AnyUrl("tcp://127.0.0.1:5020/40010?count=1&unit=1")
+            AnyUrl(f"tcp://{server.host}:{server.port}/40010?count=1&unit=1")
         )
         assert len(result) == 1
         assert result[0].text == "10"
 
 
 @pytest.mark.asyncio
-async def test_write_registers(modbus_server):
+async def test_write_registers(server):
     """Test write_registers tool."""
     async with Client(mcp) as client:
         result = await client.call_tool(
             "write_registers",
             {
-                "host": "127.0.0.1",
-                "port": 5020,
+                "host": server.host,
+                "port": server.port,
                 "address": 40001,
                 "data": [565],
                 "unit": 1,
@@ -38,14 +38,14 @@ async def test_write_registers(modbus_server):
 
 
 @pytest.mark.asyncio
-async def test_mask_write_registers(modbus_server):
+async def test_mask_write_registers(server):
     """Test mask_write_registers tool."""
     async with Client(mcp) as client:
         result = await client.call_tool(
             "mask_write_register",
             {
-                "host": "127.0.0.1",
-                "port": 5020,
+                "host": server.host,
+                "port": server.port,
                 "address": 40001,
                 "and_mask": 0xFFFF,
                 "or_mask": 0x0000,

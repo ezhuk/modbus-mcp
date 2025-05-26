@@ -4,6 +4,7 @@ import asyncio
 import pytest
 import threading
 
+from pydantic import BaseModel
 from pymodbus.datastore import (
     ModbusSequentialDataBlock,
     ModbusServerContext,
@@ -12,7 +13,12 @@ from pymodbus.datastore import (
 from pymodbus.server import StartAsyncTcpServer
 
 
-async def server_main() -> None:
+class Config(BaseModel):
+    host: str = "127.0.0.1"
+    port: int = 5020
+
+
+async def _server_main(config: Config) -> None:
     count = 100
     store = ModbusSlaveContext(
         di=ModbusSequentialDataBlock(0, [x % 2 == 1 for x in range(count)]),
@@ -21,15 +27,14 @@ async def server_main() -> None:
         ir=ModbusSequentialDataBlock(0, list(range(0, count))),
     )
     context = ModbusServerContext(slaves=store, single=True)
-    await StartAsyncTcpServer(context, address=("127.0.0.1", 5020))
-
-
-def thread_main():
-    asyncio.run(server_main())
+    await StartAsyncTcpServer(context, address=(config.host, config.port))
 
 
 @pytest.fixture(scope="session")
-def modbus_server():
-    thread = threading.Thread(target=thread_main, daemon=True)
+def server():
+    config = Config()
+    thread = threading.Thread(
+        target=lambda: asyncio.run(_server_main(config)), daemon=True
+    )
     thread.start()
-    yield
+    yield config
