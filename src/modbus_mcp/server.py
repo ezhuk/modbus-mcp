@@ -8,9 +8,9 @@ from pymodbus.client import AsyncModbusTcpClient
 
 
 class Modbus(BaseModel):
-    HOST: str = "127.0.0.1"
-    PORT: int = 502
-    UNIT: int = 1
+    host: str = "127.0.0.1"
+    port: int = 502
+    unit: int = 1
 
 
 class Settings(BaseSettings):
@@ -37,11 +37,11 @@ mcp = FastMCP(name="Modbus MCP Server")
     annotations={"title": "Read Registers", "readOnlyHint": True, "openWorldHint": True}
 )
 async def read_registers(
-    host: str = settings.modbus.HOST,
-    port: int = settings.modbus.PORT,
-    address: int = 1,
+    host: str = settings.modbus.host,
+    port: int = settings.modbus.port,
+    address: int = 40001,
     count: int = 1,
-    unit: int = settings.modbus.UNIT,
+    unit: int = settings.modbus.unit,
 ) -> int | list[int]:
     """Reads the contents of one or more registers on a remote unit."""
     try:
@@ -66,10 +66,10 @@ async def read_registers(
 )
 async def write_registers(
     data: list[int],
-    host: str = settings.modbus.HOST,
-    port: int = settings.modbus.PORT,
-    address: int = 1,
-    unit: int = settings.modbus.UNIT,
+    host: str = settings.modbus.host,
+    port: int = settings.modbus.port,
+    address: int = 40001,
+    unit: int = settings.modbus.unit,
 ) -> str:
     """Writes data to one or more registers on a remote unit."""
     try:
@@ -92,12 +92,12 @@ async def write_registers(
     }
 )
 async def mask_write_register(
-    host: str = settings.modbus.HOST,
-    port: int = settings.modbus.PORT,
+    host: str = settings.modbus.host,
+    port: int = settings.modbus.port,
     address: int = 40001,
     and_mask: int = 0xFFFF,
     or_mask: int = 0x0000,
-    unit: int = settings.modbus.UNIT,
+    unit: int = settings.modbus.unit,
 ) -> str:
     """Mask writes data to a specified register."""
     try:
