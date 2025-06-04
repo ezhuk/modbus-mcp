@@ -45,13 +45,15 @@ Each register on a device is mapped to a resource (and exposed as a tool) and [r
 
 ```python
 @mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
-@mcp.tool()
+@mcp.tool(
+    annotations={"title": "Read Registers", "readOnlyHint": True, "openWorldHint": True}
+)
 async def read_registers(
-    host: str = settings.Modbus.HOST,
-    port: int = settings.Modbus.PORT,
-    address: int = 1,
+    host: str = settings.modbus.host,
+    port: int = settings.modbus.port,
+    address: int = 40001,
     count: int = 1,
-    unit: int = settings.Modbus.UNIT,
+    unit: int = settings.modbus.unit,
 ) -> int | list[int]:
     """Reads the contents of one or more registers on a remote unit."""
     ...
@@ -62,13 +64,19 @@ async def read_registers(
 Write operations are exposed as a [tool](https://gofastmcp.com/servers/tools), accepting the same connection details (host, port, unit) and allowing to set the contents of one or more `holding registers` or `coils` in a single, atomic call.
 
 ```python
-@mcp.tool()
+@mcp.tool(
+    annotations={
+        "title": "Write Registers",
+        "readOnlyHint": False,
+        "openWorldHint": True,
+    }
+)
 async def write_registers(
     data: list[int],
-    host: str = settings.Modbus.HOST,
-    port: int = settings.Modbus.PORT,
-    address: int = 1,
-    unit: int = settings.Modbus.UNIT,
+    host: str = settings.modbus.host,
+    port: int = settings.modbus.port,
+    address: int = 40001,
+    unit: int = settings.modbus.unit,
 ) -> str:
     """Writes data to one or more registers on a remote unit."""
     ...
