@@ -1,10 +1,16 @@
 """A lightweigth MCP server for the Modbus protocol."""
 
 from fastmcp import FastMCP
+from fastmcp.server.auth import BearerAuthProvider
 from fastmcp.prompts.prompt import Message
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pymodbus.client import AsyncModbusTcpClient
+from typing import Optional
+
+
+class Auth(BaseModel):
+    key: Optional[str] = None
 
 
 class Modbus(BaseModel):
@@ -14,6 +20,7 @@ class Modbus(BaseModel):
 
 
 class Settings(BaseSettings):
+    auth: Auth = Auth()
     modbus: Modbus = Modbus()
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
@@ -29,7 +36,12 @@ _READ_FN = {
 
 _WRITE_FN = {0: ("write_coils", 1), 4: ("write_registers", 40001)}
 
-mcp = FastMCP(name="Modbus MCP Server")
+mcp = FastMCP(
+    name="Modbus MCP Server",
+    auth=(
+        BearerAuthProvider(public_key=settings.auth.key) if settings.auth.key else None
+    ),
+)
 
 
 @mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
