@@ -3,6 +3,8 @@
 from fastmcp import FastMCP
 from fastmcp.server.auth import BearerAuthProvider
 from fastmcp.prompts.prompt import Message
+from fastmcp.resources import ResourceTemplate
+from fastmcp.tools import Tool
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pymodbus.client import AsyncModbusTcpClient
@@ -44,10 +46,6 @@ mcp = FastMCP(
 )
 
 
-@mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
-@mcp.tool(
-    annotations={"title": "Read Registers", "readOnlyHint": True, "openWorldHint": True}
-)
 async def read_registers(
     host: str = settings.modbus.host,
     port: int = settings.modbus.port,
@@ -67,6 +65,25 @@ async def read_registers(
         raise RuntimeError(
             f"Could not read {address} ({count}) from {host}:{port}"
         ) from e
+
+
+mcp.add_template(
+    ResourceTemplate.from_function(
+        fn=read_registers,
+        uri_template="tcp://{host}:{port}/{address}?count={count}&unit={unit}",
+    )
+)
+
+mcp.add_tool(
+    Tool.from_function(
+        fn=read_registers,
+        annotations={
+            "title": "Read Registers",
+            "readOnlyHint": True,
+            "openWorldHint": True,
+        },
+    )
+)
 
 
 @mcp.tool(
