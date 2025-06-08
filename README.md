@@ -124,7 +124,7 @@ docker build -t modbus-mcp .
 Then run the container as follows:
 
 ```bash
-docker run -dit \
+docker run -d \
   --name modbus-mcp \
   --restart=always \
   -p 8080:8000 \
