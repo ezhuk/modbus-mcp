@@ -1,0 +1,22 @@
+---
+title: Prompts
+icon: chevron-right
+---
+
+Structured response messages are implemented using [prompts](https://gofastmcp.com/servers/prompts) that help guide the interaction, clarify missing parameters, and handle errors gracefully.
+
+```python
+@mcp.prompt(name="modbus_help", tags={"modbus", "help"})
+def modbus_help() -> list[Message]:
+    """Provides examples of how to use the Modbus MCP server."""
+    ...
+```
+
+Here are some example text inputs that can be used to interact with the server.
+
+```text
+Please read the value of register 40001 on 127.0.0.1:502.
+Set register 40005 to 123 on host 192.168.1.10, unit 3.
+Write [1, 2, 3] to holding registers starting at address 40010.
+What is the status of input register 30010 on 10.0.0.5?
+```

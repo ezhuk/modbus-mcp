@@ -1,0 +1,49 @@
+---
+title: Registers
+icon: settings-2
+---
+
+The Modbus MCP server leverages FastMCP 2.0's core building blocks - resource templates, tools, and prompts - to streamline Modbus read and write operations with minimal boilerplate and a clean, Pythonic interface.
+
+### Read Registers
+
+Each register on a device is mapped to a resource (and exposed as a tool) and [resource templates](https://gofastmcp.com/servers/resources#resource-templates) are used to specify connection details (host, port, unit) and read parameters (address, count).
+
+```python
+@mcp.resource("tcp://{host}:{port}/{address}?count={count}&unit={unit}")
+@mcp.tool(
+    annotations={"title": "Read Registers", "readOnlyHint": True, "openWorldHint": True}
+)
+async def read_registers(
+    host: str = settings.modbus.host,
+    port: int = settings.modbus.port,
+    address: int = 40001,
+    count: int = 1,
+    unit: int = settings.modbus.unit,
+) -> int | list[int]:
+    """Reads the contents of one or more registers on a remote unit."""
+    ...
+```
+
+### Write Registers
+
+Write operations are exposed as a [tool](https://gofastmcp.com/servers/tools), accepting the same connection details (host, port, unit) and allowing to set the contents of one or more `holding registers` or `coils` in a single, atomic call.
+
+```python
+@mcp.tool(
+    annotations={
+        "title": "Write Registers",
+        "readOnlyHint": False,
+        "openWorldHint": True,
+    }
+)
+async def write_registers(
+    data: list[int],
+    host: str = settings.modbus.host,
+    port: int = settings.modbus.port,
+    address: int = 40001,
+    unit: int = settings.modbus.unit,
+) -> str:
+    """Writes data to one or more registers on a remote unit."""
+    ...
+```
