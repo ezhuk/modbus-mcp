@@ -1,6 +1,6 @@
 ## PydanticAI MCP Example
 
-This example demonstrates how to use the [PydanticAI](https://github.com/pydantic/pydantic-ai) to connect to the [Modbus MCP server](https://github.com/ezhuk/modbus-mcp) using the `Streamable HTTP` transport.
+This example demonstrates how to use the [PydanticAI Agent Framework](https://ai.pydantic.dev) to connect to the [Modbus MCP server](https://github.com/ezhuk/modbus-mcp) using the `Streamable HTTP` transport.
 
 ## Getting Started
 
