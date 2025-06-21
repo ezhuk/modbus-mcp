@@ -24,7 +24,9 @@ class Modbus(BaseModel):
 class Settings(BaseSettings):
     auth: Auth = Auth()
     modbus: Modbus = Modbus()
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", env_nested_delimiter="__"
+    )
 
 
 settings = Settings()
