@@ -61,7 +61,7 @@ async def read_registers(
             func, offset = _READ_FN[address // 10000]
             method = getattr(client, func)
             res = await method(address - offset, count=count, slave=unit)
-            out = getattr(res, "registers", None) or getattr(res, "bits", None)
+            out = getattr(res, "registers", []) or getattr(res, "bits", [])
             return [int(x) for x in out] if count > 1 else out[0]
     except Exception as e:
         raise RuntimeError(
