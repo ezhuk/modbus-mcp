@@ -1,17 +1,18 @@
 [project]
 name = "modbus-mcp"
-version = "0.1.28"
+version = "0.2.0"
 description = "A Model Context Protocol (MCP) server for Modbus"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastmcp>=2.8.0",
+    "fastmcp>=2.9.2",
     "pydantic-settings>=2.10.0",
     "pymodbus>=3.9.2",
+    "typer>=0.16.0",
 ]
 
 [project.scripts]
-modbus-mcp = "modbus_mcp:main"
+modbus-mcp = "modbus_mcp.cli:app"
 
 [build-system]
 requires = ["hatchling"]
