@@ -12,6 +12,8 @@ from pymodbus.datastore import (
 )
 from pymodbus.server import StartAsyncTcpServer
 
+from modbus_mcp.server import ModbusMCP
+
 
 class Config(BaseModel):
     host: str = "127.0.0.1"
@@ -38,3 +40,8 @@ def server():
     )
     thread.start()
     yield config
+
+
+@pytest.fixture(scope="session")
+def mcp():
+    return ModbusMCP()
