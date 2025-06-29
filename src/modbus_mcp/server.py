@@ -1,32 +1,10 @@
-"""A lightweigth MCP server for the Modbus protocol."""
-
 from fastmcp import FastMCP
 from fastmcp.server.auth import BearerAuthProvider
 from fastmcp.prompts.prompt import Message
 from fastmcp.resources import ResourceTemplate
-from fastmcp.tools import Tool
-from pydantic import BaseModel
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pymodbus.client import AsyncModbusTcpClient
-from typing import Optional
 
-
-class Auth(BaseModel):
-    key: Optional[str] = None
-
-
-class Modbus(BaseModel):
-    host: str = "127.0.0.1"
-    port: int = 502
-    unit: int = 1
-
-
-class Settings(BaseSettings):
-    auth: Auth = Auth()
-    modbus: Modbus = Modbus()
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", env_nested_delimiter="__"
-    )
+from modbus_mcp.settings import Settings
 
 
 settings = Settings()
@@ -39,13 +17,6 @@ _READ_FN = {
 }
 
 _WRITE_FN = {0: ("write_coils", 1), 4: ("write_registers", 40001)}
-
-mcp = FastMCP(
-    name="Modbus MCP Server",
-    auth=(
-        BearerAuthProvider(public_key=settings.auth.key) if settings.auth.key else None
-    ),
-)
 
 
 async def read_registers(
@@ -69,32 +40,6 @@ async def read_registers(
         ) from e
 
 
-mcp.add_template(
-    ResourceTemplate.from_function(
-        fn=read_registers,
-        uri_template="tcp://{host}:{port}/{address}?count={count}&unit={unit}",
-    )
-)
-
-mcp.add_tool(
-    Tool.from_function(
-        fn=read_registers,
-        annotations={
-            "title": "Read Registers",
-            "readOnlyHint": True,
-            "openWorldHint": True,
-        },
-    )
-)
-
-
-@mcp.tool(
-    annotations={
-        "title": "Write Registers",
-        "readOnlyHint": False,
-        "openWorldHint": True,
-    }
-)
 async def write_registers(
     data: list[int],
     host: str = settings.modbus.host,
@@ -115,13 +60,6 @@ async def write_registers(
         raise RuntimeError(f"{e}") from e
 
 
-@mcp.tool(
-    annotations={
-        "title": "Mask Write Register",
-        "readOnlyHint": False,
-        "openWorldHint": True,
-    }
-)
 async def mask_write_register(
     host: str = settings.modbus.host,
     port: int = settings.modbus.port,
@@ -148,7 +86,6 @@ async def mask_write_register(
         raise RuntimeError(f"{e}") from e
 
 
-@mcp.prompt(name="modbus_help", tags={"modbus", "help"})
 def modbus_help() -> list[Message]:
     """Provides examples of how to use the Modbus MCP server."""
     return [
@@ -160,7 +97,6 @@ def modbus_help() -> list[Message]:
     ]
 
 
-@mcp.prompt(name="modbus_error", tags={"modbus", "error"})
 def modbus_error(error: str | None = None) -> list[Message]:
     """Asks the user how to handle an error."""
     return (
@@ -171,3 +107,53 @@ def modbus_error(error: str | None = None) -> list[Message]:
         if error
         else []
     )
+
+
+class ModbusMCP(FastMCP):
+    def __init__(self, **kwargs):
+        super().__init__(
+            name="Modbus MCP Server",
+            auth=(
+                BearerAuthProvider(public_key=settings.auth.key)
+                if settings.auth.key
+                else None
+            ),
+            **kwargs,
+        )
+
+        self.add_template(
+            ResourceTemplate.from_function(
+                fn=read_registers,
+                uri_template="tcp://{host}:{port}/{address}?count={count}&unit={unit}",
+            )
+        )
+
+        self.tool(
+            read_registers,
+            annotations={
+                "title": "Read Registers",
+                "readOnlyHint": True,
+                "openWorldHint": True,
+            },
+        )
+
+        self.tool(
+            write_registers,
+            annotations={
+                "title": "Write Registers",
+                "readOnlyHint": False,
+                "openWorldHint": True,
+            },
+        )
+
+        self.tool(
+            mask_write_register,
+            annotations={
+                "title": "Mask Write Register",
+                "readOnlyHint": False,
+                "openWorldHint": True,
+            },
+        )
+
+        self.prompt(modbus_error, name="modbus_error", tags={"modbus", "error"})
+        self.prompt(modbus_help, name="modbus_help", tags={"modbus", "help"})

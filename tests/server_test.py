@@ -5,11 +5,9 @@ import pytest
 from fastmcp import Client
 from pydantic import AnyUrl
 
-from modbus_mcp.server import mcp
-
 
 @pytest.mark.asyncio
-async def test_read_registers(server):
+async def test_read_registers(server, mcp):
     """Test read_registers resource."""
     async with Client(mcp) as client:
         result = await client.read_resource(
@@ -20,7 +18,7 @@ async def test_read_registers(server):
 
 
 @pytest.mark.asyncio
-async def test_write_registers(server):
+async def test_write_registers(server, mcp):
     """Test write_registers tool."""
     async with Client(mcp) as client:
         result = await client.call_tool(
@@ -38,7 +36,7 @@ async def test_write_registers(server):
 
 
 @pytest.mark.asyncio
-async def test_mask_write_registers(server):
+async def test_mask_write_registers(server, mcp):
     """Test mask_write_registers tool."""
     async with Client(mcp) as client:
         result = await client.call_tool(
@@ -57,7 +55,7 @@ async def test_mask_write_registers(server):
 
 
 @pytest.mark.asyncio
-async def test_help_prompt():
+async def test_help_prompt(mcp):
     """Test help prompt."""
     async with Client(mcp) as client:
         result = await client.get_prompt("modbus_help", {})
@@ -65,7 +63,7 @@ async def test_help_prompt():
 
 
 @pytest.mark.asyncio
-async def test_error_prompt():
+async def test_error_prompt(mcp):
     """Test error prompt."""
     async with Client(mcp) as client:
         result = await client.get_prompt(

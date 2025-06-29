@@ -1,10 +1,7 @@
-"""A lightweight Modbus MCP server."""
+from importlib.metadata import version
 
-import asyncio
-
-from .server import mcp
+from modbus_mcp.server import ModbusMCP
 
 
-def main() -> None:
-    """Run the MCP server via streamable-http transport."""
-    asyncio.run(mcp.run_async(transport="streamable-http"))
+__version__ = version("modbus-mcp")
+__all__ = ["ModbusMCP"]
