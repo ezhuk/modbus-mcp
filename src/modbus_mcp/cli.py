@@ -13,4 +13,4 @@ app = typer.Typer(
 @app.command()
 def run():
     server = ModbusMCP()
-    asyncio.run(server.run_async(transport="streamable-http"))
+    asyncio.run(server.run_async(transport="http"))
