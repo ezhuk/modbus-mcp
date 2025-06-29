@@ -3,29 +3,60 @@
 A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that connects LLM agents to [Modbus](https://en.wikipedia.org/wiki/Modbus) devices in a secure, standardized way, enabling seamless integration of AI-driven workflows with Building Automation (BAS) and Industrial Control (ICS) systems, allowing agents to monitor real-time sensor data, actuate devices, and orchestrate complex automation tasks.
 
 [![test](https://github.com/ezhuk/modbus-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/ezhuk/modbus-mcp/actions/workflows/test.yml)
-[![PyPI - Version](https://img.shields.io/pypi/v/modbus-mcp.svg?color=blue)](https://pypi.org/p/modbus-mcp)
+[![PyPI - Version](https://img.shields.io/pypi/v/modbus-mcp.svg)](https://pypi.org/p/modbus-mcp)
 
 ## Getting Started
 
-The server is built with [FastMCP 2.0](https://gofastmcp.com/getting-started/welcome) and uses [uv](https://github.com/astral-sh/uv) for project and dependency management. Simply run the following command to install `uv` or check out the [installation guide](https://docs.astral.sh/uv/getting-started/installation/) for more details and alternative installation methods.
+Use [uv](https://github.com/astral-sh/uv) to add and manage the Modbus MCP server as a dependency in your project, or install it directly using `uv pip` or `pip`. Check out the [Installation](https://github.com/ezhuk/modbus-mcp/blob/main/docs/modbus-mcp/installation.mdx) section of the documentation for full installation instructions and more details.
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+uv add modbus-mcp
 ```
 
-Clone the repository, then use `uv` to install project dependencies and create a virtual environment.
+The server can be run directly from your application as follows. By default, it listens on `http://127.0.0.1:8000/mcp/` using the `Streamable HTTP` transport.
+
+```python
+# app.py
+from modbus_mcp import ModbusMCP
+
+mcp = ModbusMCP()
+
+if __name__ == "__main__":
+    mcp.run(transport="http")
+```
+
+Or you can run it from the command line using the provided `CLI` without modifying the source code.
 
 ```bash
-git clone https://github.com/ezhuk/modbus-mcp.git
-cd modbus-mcp
-uv sync
+modbus-mcp
 ```
 
-Start the Modbus MCP server by running the following command in your terminal. It defaults to using the `Streamable HTTP` transport on port `8000`.
+Additionally, if you prefer not to install it at all, the server can be run in an ephemeral, isolated environment using `uvx`.
 
 ```bash
-uv run modbus-mcp
+uvx modbus-mcp
 ```
+
+### Configuration
+
+By default, the Modbus MCP server connects to a Modbus device at `127.0.0.1:502`. In most cases this needs to be changed at runtime to point it to an actual device. The following environment variables can be used to override device connection parameters.
+
+```bash
+export MODBUS_MCP_MODBUS__HOST=10.0.0.1
+export MODBUS_MCP_MODBUS__PORT=502
+export MODBUS_MCP_MODBUS__UNIT=1
+```
+
+Alternatively, they can be specified in a `.env` file in the working directory.
+
+```text
+# .env
+modbus__host=10.0.0.1
+modbus__port=502
+modbus__unit=1
+```
+
+### MCP Inspector
 
 To confirm the server is up and running and explore available resources and tools, run the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector) and connect it to the Modbus MCP server at `http://127.0.0.1:8000/mcp/`. Make sure to set the transport to `Streamable HTTP`.
 
@@ -38,7 +69,7 @@ npx @modelcontextprotocol/inspector
 
 ## Core Concepts
 
-The Modbus MCP server leverages FastMCP 2.0's core building blocks - resource templates, tools, and prompts - to streamline Modbus read and write operations with minimal boilerplate and a clean, Pythonic interface.
+The Modbus MCP server is built with [FastMCP 2.0](https://github.com/jlowin/fastmcp) and leverages its core building blocks - resource templates, tools, and prompts - to streamline Modbus read and write operations with minimal boilerplate and a clean, Pythonic interface.
 
 ### Read Registers
 
