@@ -7,13 +7,13 @@ A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io) se
 
 ## Getting Started
 
-Use [uv](https://github.com/astral-sh/uv) to add and manage the Modbus MCP server as a dependency in your project, or install it directly using `uv pip` or `pip`. Check out the [Installation](https://github.com/ezhuk/modbus-mcp/blob/main/docs/modbus-mcp/installation.mdx) section of the documentation for full installation instructions and more details.
+Use [uv](https://github.com/astral-sh/uv) to add and manage the Modbus MCP server as a dependency in your project, or install it directly via `uv pip install` or `pip install`. See the [Installation](https://github.com/ezhuk/modbus-mcp/blob/main/docs/modbus-mcp/installation.mdx) section of the documentation for full installation instructions and more details.
 
 ```bash
 uv add modbus-mcp
 ```
 
-The server can be run directly from your application as follows. By default, it listens on `http://127.0.0.1:8000/mcp/` using the `Streamable HTTP` transport.
+The server can be embedded in and run directly from your application. By default, it exposes a `Streamable HTTP` endpoint at `http://127.0.0.1:8000/mcp/`.
 
 ```python
 # app.py
@@ -25,13 +25,13 @@ if __name__ == "__main__":
     mcp.run(transport="http")
 ```
 
-Or you can run it from the command line using the provided `CLI` without modifying the source code.
+It can also be launched from the command line using the provided `CLI` without modifying the source code.
 
 ```bash
 modbus-mcp
 ```
 
-Additionally, if you prefer not to install it at all, the server can be run in an ephemeral, isolated environment using `uvx`.
+Or in an ephemeral, isolated environment using `uvx`. Check out the [Using tools](https://docs.astral.sh/uv/guides/tools/) guide for more details.
 
 ```bash
 uvx modbus-mcp
@@ -39,7 +39,7 @@ uvx modbus-mcp
 
 ### Configuration
 
-By default, the Modbus MCP server connects to a Modbus device at `127.0.0.1:502`. In most cases this needs to be changed at runtime to point it to an actual device. The following environment variables can be used to override device connection parameters.
+For the use cases where most operations target a specific device, such as a Programmable Logic Controller (PLC) or Modbus gateway, its connection settings (`host`, `port`, and `unit`) can be specified at runtime using environment variables so that all prompts that omit explicit connection parameters will be routed to this device.
 
 ```bash
 export MODBUS_MCP_MODBUS__HOST=10.0.0.1
@@ -47,7 +47,7 @@ export MODBUS_MCP_MODBUS__PORT=502
 export MODBUS_MCP_MODBUS__UNIT=1
 ```
 
-Alternatively, they can be specified in a `.env` file in the working directory.
+These settings can also be specified in a `.env` file in the working directory.
 
 ```text
 # .env
