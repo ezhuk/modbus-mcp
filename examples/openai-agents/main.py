@@ -13,20 +13,14 @@ async def run(mcp_server: MCPServer):
         model_settings=ModelSettings(tool_choice="required"),
     )
 
-    message = "Read the content of 40010 on 127.0.0.1:502."
-    print(f"Running: {message}")
-    result = await Runner.run(starting_agent=agent, input=message)
-    print(result.final_output)
-
-    message = "Write [123, 45, 678] to registers starting at 40011."
-    print(f"Running: {message}")
-    result = await Runner.run(starting_agent=agent, input=message)
-    print(result.final_output)
-
-    message = "Read the value of 40012 holding register."
-    print(f"Running: {message}")
-    result = await Runner.run(starting_agent=agent, input=message)
-    print(result.final_output)
+    for prompt in [
+        "Read the content of 40010 on 127.0.0.1:502.",
+        "Write [123, 45, 678] to registers starting at 40011.",
+        "Read the value of 40012 holding register.",
+    ]:
+        print(f"Running: {prompt}")
+        result = await Runner.run(starting_agent=agent, input=prompt)
+        print(result.final_output)
 
 
 async def main():

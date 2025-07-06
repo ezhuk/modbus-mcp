@@ -17,11 +17,12 @@ async def main():
     )
 
     async with agent.run_mcp_servers():
-        resp = await agent.run("Read the content of 40010 on 127.0.0.1:502.")
-        print(resp.output)
-
-        resp = await agent.run("Write [123, 45, 678] to registers starting at 40011.")
-        print(resp.output)
+        for prompt in [
+            "Read the content of 40010 on 127.0.0.1:502.",
+            "Write [123, 45, 678] to registers starting at 40011.",
+        ]:
+            resp = await agent.run(prompt)
+            print(resp.output)
 
 
 if __name__ == "__main__":
