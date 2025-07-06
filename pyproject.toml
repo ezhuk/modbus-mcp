@@ -5,7 +5,7 @@ description = "A Model Context Protocol (MCP) server for Modbus"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastmcp>=2.9.2",
+    "fastmcp>=2.10.2",
     "pydantic-settings>=2.10.0",
     "pymodbus>=3.9.2",
     "typer>=0.16.0",

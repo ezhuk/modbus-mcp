@@ -31,8 +31,8 @@ async def test_write_registers(server, mcp):
                 "unit": 1,
             },
         )
-        assert len(result) == 1
-        assert "succedeed" in result[0].text
+        assert len(result.content) == 1
+        assert "succedeed" in result.content[0].text
 
 
 @pytest.mark.asyncio
@@ -50,8 +50,8 @@ async def test_mask_write_registers(server, mcp):
                 "unit": 1,
             },
         )
-        assert len(result) == 1
-        assert "succedeed" in result[0].text
+        assert len(result.content) == 1
+        assert "succedeed" in result.content[0].text
 
 
 @pytest.mark.asyncio
