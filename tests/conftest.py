@@ -17,7 +17,7 @@ from modbus_mcp.server import ModbusMCP
 
 class Config(BaseModel):
     host: str = "127.0.0.1"
-    port: int = 5020
+    port: int = 502
 
 
 async def _server_main(config: Config) -> None:
