@@ -55,6 +55,30 @@ async def test_mask_write_registers(server, mcp):
 
 
 @pytest.mark.asyncio
+async def test_search(server, mcp):
+    """Test search tool."""
+    async with Client(mcp) as client:
+        result = await client.call_tool(
+            "search",
+            {"query": "40001,10"},
+        )
+        assert len(result.content) == 1
+        assert "40001" in result.content[0].text
+
+
+@pytest.mark.asyncio
+async def test_fetch(server, mcp):
+    """Test fetch tool."""
+    async with Client(mcp) as client:
+        result = await client.call_tool(
+            "fetch",
+            {"id": "40002,1"},
+        )
+        assert len(result.content) == 1
+        assert "2" in result.content[0].text
+
+
+@pytest.mark.asyncio
 async def test_help_prompt(mcp):
     """Test help prompt."""
     async with Client(mcp) as client:
