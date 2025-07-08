@@ -176,5 +176,23 @@ class ModbusMCP(FastMCP):
             },
         )
 
+        self.tool(
+            search,
+            annotations={
+                "title": "Search",
+                "readOnlyHint": True,
+                "openWorldHint": True,
+            },
+        )
+
+        self.tool(
+            fetch,
+            annotations={
+                "title": "Fetch",
+                "readOnlyHint": True,
+                "openWorldHint": True,
+            },
+        )
+
         self.prompt(modbus_error, name="modbus_error", tags={"modbus", "error"})
         self.prompt(modbus_help, name="modbus_help", tags={"modbus", "help"})
