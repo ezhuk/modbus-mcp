@@ -23,3 +23,5 @@ jobs:
           uv sync
           uv run pre-commit run --all-files
           uv run pytest
+        env:
+          MODBUS_MCP_MODBUS__PORT: 5020
