@@ -86,6 +86,27 @@ async def mask_write_register(
         raise RuntimeError(f"{e}") from e
 
 
+async def search(query: str) -> list[int]:
+    """Deep Research search registers."""
+    offset, sep, count = query.strip().partition(",")
+    start = int(offset)
+    res = []
+    for x in range(int(count) if sep else 100):
+        try:
+            addr = start + x
+            await read_registers(address=addr)
+            res.append(addr)
+        except Exception:
+            continue
+    return res
+
+
+async def fetch(id: str) -> int | list[int]:
+    """Deep Research fetch the contents of one or more registers."""
+    addr, sep, count = id.strip().partition(",")
+    return await read_registers(address=int(addr), count=int(count) if sep else 1)
+
+
 def modbus_help() -> list[Message]:
     """Provides examples of how to use the Modbus MCP server."""
     return [
