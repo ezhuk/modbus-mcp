@@ -18,6 +18,7 @@ class Modbus(BaseModel):
 
 
 class Device(BaseModel):
+    name: str
     host: str
     port: int
     unit: int
