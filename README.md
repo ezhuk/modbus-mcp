@@ -1,6 +1,7 @@
 ## Modbus MCP Server
 
 [![test](https://github.com/ezhuk/modbus-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/ezhuk/modbus-mcp/actions/workflows/test.yml)
+[![codecov](https://codecov.io/github/ezhuk/modbus-mcp/graph/badge.svg?token=RCKEZAJGXX)](https://codecov.io/github/ezhuk/modbus-mcp)
 [![PyPI - Version](https://img.shields.io/pypi/v/modbus-mcp.svg)](https://pypi.org/p/modbus-mcp)
 
 A lightweight [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that connects LLM agents to [Modbus](https://en.wikipedia.org/wiki/Modbus) devices in a secure, standardized way, enabling seamless integration of AI-driven workflows with Building Automation (BAS) and Industrial Control (ICS) systems, allowing agents to monitor real-time sensor data, actuate devices, and orchestrate complex automation tasks.
