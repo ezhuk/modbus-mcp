@@ -11,6 +11,7 @@ jobs:
   build:
     permissions:
       contents: read
+      id-token: write
     runs-on: ubuntu-latest
 
     steps:
@@ -23,6 +24,9 @@ jobs:
           uv sync
           uv run pre-commit run --all-files
       - run: |
-          uv run pytest
+          uv run pytest --cov=modbus_mcp --cov-report=xml
         env:
           MODBUS_MCP_MODBUS__PORT: 5020
+      - uses: codecov/codecov-action@v5
+        with:
+          use_oidc: true
