@@ -30,7 +30,7 @@ def _get_device(
         for x in settings.devices:
             if x.name == name:
                 return x.host, x.port, x.unit
-        raise RuntimeError(f"Device '{name!r}' not found")
+        raise RuntimeError(f"Device not found")
     return (
         host if host is not None else settings.modbus.host,
         port if port is not None else settings.modbus.port,
