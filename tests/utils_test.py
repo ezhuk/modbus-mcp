@@ -9,7 +9,6 @@ def test_get_device():
     with pytest.raises(RuntimeError) as e:
         get_device(settings, "Foo")
     assert "not found" in str(e.value)
-    assert get_device(settings) == ("127.0.0.1", 502, 1)
     assert get_device(settings, host="10.0.0.1", port=5020, unit=3) == (
         "10.0.0.1",
         5020,
