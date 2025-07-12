@@ -5,6 +5,7 @@ from fastmcp.resources import ResourceTemplate
 from pymodbus.client import AsyncModbusTcpClient
 
 from modbus_mcp.settings import Settings
+from modbus_mcp.utils import get_device
 
 
 settings = Settings()
@@ -19,25 +20,6 @@ _READ_FN = {
 _WRITE_FN = {0: ("write_coils", 1), 4: ("write_registers", 40001)}
 
 
-def _get_device(
-    name: str | None = None,
-    host: str | None = None,
-    port: int | None = None,
-    unit: int | None = None,
-) -> tuple[str, int, int]:
-    """Find a device by name or return the default settings."""
-    if name:
-        for x in settings.devices:
-            if x.name == name:
-                return x.host, x.port, x.unit
-        raise RuntimeError("Device not found")
-    return (
-        host if host is not None else settings.modbus.host,
-        port if port is not None else settings.modbus.port,
-        unit if unit is not None else settings.modbus.unit,
-    )
-
-
 async def read_registers(
     address: int = 40001,
     count: int = 1,
@@ -48,7 +30,7 @@ async def read_registers(
 ) -> int | list[int]:
     """Reads the contents of one or more registers on a remote unit."""
     try:
-        host, port, unit = _get_device(name, host, port, unit)
+        host, port, unit = get_device(settings, name, host, port, unit)
         async with AsyncModbusTcpClient(host, port=port) as client:
             func, offset = _READ_FN[address // 10000]
             method = getattr(client, func)
@@ -71,7 +53,7 @@ async def write_registers(
 ) -> str:
     """Writes data to one or more registers on a remote unit."""
     try:
-        host, port, unit = _get_device(name, host, port, unit)
+        host, port, unit = get_device(settings, name, host, port, unit)
         async with AsyncModbusTcpClient(host, port=port) as client:
             func, offset = _WRITE_FN[address // 10000]
             method = getattr(client, func)
@@ -94,7 +76,7 @@ async def mask_write_register(
 ) -> str:
     """Mask writes data to a specified register."""
     try:
-        host, port, unit = _get_device(name, host, port, unit)
+        host, port, unit = get_device(settings, name, host, port, unit)
         async with AsyncModbusTcpClient(host, port=port) as client:
             res = await client.mask_write_register(
                 address=(address - 40001),

@@ -1,5 +1,3 @@
-"""Test Fixtures."""
-
 import asyncio
 import pytest
 import threading
