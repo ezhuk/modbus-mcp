@@ -43,3 +43,14 @@ def server():
 @pytest.fixture(scope="session")
 def mcp():
     return ModbusMCP()
+
+
+@pytest.fixture()
+def cli(monkeypatch):
+    async def dummy_run_async(self, transport):
+        return
+
+    monkeypatch.setattr(
+        "modbus_mcp.cli.ModbusMCP.run_async",
+        dummy_run_async,
+    )
