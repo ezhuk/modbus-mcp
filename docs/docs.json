@@ -36,7 +36,8 @@
             "group": "Examples",
             "pages": [
               "modbus-mcp/openai",
-              "modbus-mcp/openai-agents"
+              "modbus-mcp/openai-agents",
+              "modbus-mcp/pydanticai"
             ]
           }
         ]
