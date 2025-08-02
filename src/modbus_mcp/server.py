@@ -1,5 +1,5 @@
 from fastmcp import FastMCP
-from fastmcp.server.auth import BearerAuthProvider
+from fastmcp.server.auth.providers.workos import AuthKitProvider
 from fastmcp.prompts.prompt import Message
 from fastmcp.resources import ResourceTemplate
 from pymodbus.client import AsyncModbusTcpClient
@@ -34,7 +34,7 @@ async def read_registers(
         async with AsyncModbusTcpClient(host, port=port) as client:
             func, offset = _READ_FN[address // 10000]
             method = getattr(client, func)
-            res = await method(address - offset, count=count, slave=unit)
+            res = await method(address - offset, count=count, device_id=unit)
             out = getattr(res, "registers", []) or getattr(res, "bits", [])
             return [int(x) for x in out] if count > 1 else out[0]
     except Exception as e:
@@ -57,7 +57,7 @@ async def write_registers(
         async with AsyncModbusTcpClient(host, port=port) as client:
             func, offset = _WRITE_FN[address // 10000]
             method = getattr(client, func)
-            res = await method(address - offset, data, slave=unit)
+            res = await method(address - offset, data, device_id=unit)
             if res.isError():
                 raise RuntimeError(f"Could not write to {address} on {host}:{port}")
             return f"Write to {address} on {host}:{port} has succedeed"
@@ -82,7 +82,7 @@ async def mask_write_register(
                 address=(address - 40001),
                 and_mask=and_mask,
                 or_mask=or_mask,
-                slave=unit,
+                device_id=unit,
             )
             if res.isError():
                 raise RuntimeError(
@@ -142,8 +142,10 @@ class ModbusMCP(FastMCP):
         super().__init__(
             name="Modbus MCP Server",
             auth=(
-                BearerAuthProvider(public_key=settings.auth.key)
-                if settings.auth.key
+                AuthKitProvider(
+                    authkit_domain=settings.auth.domain, base_url=settings.auth.url
+                )
+                if settings.auth.domain and settings.auth.url
                 else None
             ),
             **kwargs,
