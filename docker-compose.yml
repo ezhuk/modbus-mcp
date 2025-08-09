@@ -4,3 +4,8 @@ services:
     ports:
       - "8080:8000"
     restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - modbus_mcp_modbus__host=${modbus_mcp_modbus__host:-127.0.0.1}
+      - modbus_mcp_modbus__port=${modbus_mcp_modbus__port:-502}
