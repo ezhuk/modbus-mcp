@@ -154,7 +154,7 @@ class ModbusMCP(FastMCP):
         self.add_template(
             ResourceTemplate.from_function(
                 fn=read_registers,
-                uri_template="tcp://{host}:{port}/{address}?count={count}&unit={unit}",
+                uri_template="tcp://{host}:{port}/{address}{?count,unit}",
             )
         )
 
