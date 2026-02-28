@@ -27,7 +27,7 @@ async def read_registers(
     host: str | None = None,
     port: int | None = None,
     unit: int | None = None,
-) -> int | list[int]:
+) -> str:
     """Reads the contents of one or more registers on a remote unit."""
     try:
         host, port, unit = get_device(settings, name, host, port, unit)
