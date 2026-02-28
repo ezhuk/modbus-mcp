@@ -27,7 +27,7 @@ async def read_registers(
     host: str | None = None,
     port: int | None = None,
     unit: int | None = None,
-) -> int | list[int]:
+) -> str:
     """Reads the contents of one or more registers on a remote unit."""
     try:
         host, port, unit = get_device(settings, name, host, port, unit)
@@ -36,7 +36,7 @@ async def read_registers(
             method = getattr(client, func)
             res = await method(address - offset, count=count, device_id=unit)
             out = getattr(res, "registers", []) or getattr(res, "bits", [])
-            return [int(x) for x in out] if count > 1 else out[0]
+            return ",".join(str(x) for x in out) if count > 1 else str(out[0])
     except Exception as e:
         raise RuntimeError(
             f"Could not read {address} ({count}) from {host}:{port}"
@@ -91,27 +91,6 @@ async def mask_write_register(
             return f"Mask write to {address} on {host}:{port} has succedeed"
     except Exception as e:
         raise RuntimeError(f"{e}") from e
-
-
-async def search(query: str) -> list[int]:
-    """Deep Research search registers."""
-    offset, sep, count = query.strip().partition(",")
-    start = int(offset)
-    res = []
-    for x in range(int(count) if sep else 100):
-        try:
-            addr = start + x
-            await read_registers(address=addr)
-            res.append(addr)
-        except Exception:
-            continue
-    return res
-
-
-async def fetch(id: str) -> int | list[int]:
-    """Deep Research fetch the contents of one or more registers."""
-    addr, sep, count = id.strip().partition(",")
-    return await read_registers(address=int(addr), count=int(count) if sep else 1)
 
 
 def modbus_help() -> list[Message]:
@@ -181,24 +160,6 @@ class ModbusMCP(FastMCP):
             annotations={
                 "title": "Mask Write Register",
                 "readOnlyHint": False,
-                "openWorldHint": True,
-            },
-        )
-
-        self.tool(
-            search,
-            annotations={
-                "title": "Search",
-                "readOnlyHint": True,
-                "openWorldHint": True,
-            },
-        )
-
-        self.tool(
-            fetch,
-            annotations={
-                "title": "Fetch",
-                "readOnlyHint": True,
                 "openWorldHint": True,
             },
         )
