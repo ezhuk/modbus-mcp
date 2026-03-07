@@ -2,6 +2,7 @@ import pytest
 
 from fastmcp.exceptions import McpError, ToolError
 from pydantic import AnyUrl
+from starlette.requests import Request
 
 
 @pytest.mark.asyncio
@@ -95,3 +96,18 @@ async def test_error_prompt(mcp, client):
 
     result = await client.get_prompt("modbus_error", {"error": ""})
     assert len(result.messages) == 0
+
+
+@pytest.mark.asyncio
+async def test_health_check(mcp):
+    response = await mcp.health_check(
+        Request(
+            {
+                "type": "http",
+                "method": "GET",
+                "path": "/health",
+                "headers": [],
+            }
+        )
+    )
+    assert response.status_code == 200

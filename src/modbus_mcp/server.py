@@ -3,6 +3,8 @@ from fastmcp.server.auth.providers.workos import AuthKitProvider
 from fastmcp.prompts.prompt import Message
 from fastmcp.resources import ResourceTemplate
 from pymodbus.client import AsyncModbusTcpClient
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from modbus_mcp.settings import Settings
 from modbus_mcp.utils import get_device
@@ -166,3 +168,8 @@ class ModbusMCP(FastMCP):
 
         self.prompt(modbus_error, name="modbus_error", tags={"modbus", "error"})
         self.prompt(modbus_help, name="modbus_help", tags={"modbus", "help"})
+
+        self.custom_route("/health", methods=["GET"])(self.health_check)
+
+    async def health_check(self, request: Request) -> JSONResponse:
+        return JSONResponse({"status": "ok"})
