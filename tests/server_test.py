@@ -14,6 +14,10 @@ async def test_read_registers(server, mcp, client):
     assert len(result) == 1
     assert result[0].text == "10"
 
+    with pytest.raises(McpError) as e:
+        await client.read_resource(AnyUrl("tcp://none:502/40010?count=1&unit=1"))
+    assert "Could not read" in str(e.value)
+
     result = await client.call_tool(
         "read_registers",
         {
@@ -27,9 +31,18 @@ async def test_read_registers(server, mcp, client):
     assert len(result.content) == 1
     assert result.content[0].text == "10"
 
-    with pytest.raises(McpError) as e:
-        await client.read_resource(AnyUrl("tcp://none:502/40010?count=1&unit=1"))
-    assert "Could not read" in str(e.value)
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "read_registers",
+            {
+                "host": "none",
+                "port": server.port,
+                "address": 40010,
+                "count": 1,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
 
 
 @pytest.mark.asyncio
@@ -110,6 +123,19 @@ async def test_read_information(server, mcp, client):
     assert len(result.content) == 1
     assert "Test Vendor" in result.content[0].text
 
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "read_information",
+            {
+                "code": 1,
+                "object_id": 0,
+                "host": "none",
+                "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
+
 
 @pytest.mark.asyncio
 async def test_read_exception(server, mcp, client):
@@ -124,6 +150,17 @@ async def test_read_exception(server, mcp, client):
     )
     assert len(result.content) == 1
     assert result.content[0].text
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "read_exception",
+            {
+                "host": "none",
+                "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
 
 
 @pytest.mark.asyncio
