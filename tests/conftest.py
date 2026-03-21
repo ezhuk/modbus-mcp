@@ -6,6 +6,7 @@ import threading
 from fastmcp import Client
 
 from pydantic import BaseModel
+from pymodbus import ModbusDeviceIdentification
 from pymodbus.datastore import (
     ModbusSequentialDataBlock,
     ModbusServerContext,
@@ -30,7 +31,17 @@ async def _server_main(config: Config) -> None:
         ir=ModbusSequentialDataBlock(0, list(range(0, count))),
     )
     context = ModbusServerContext(devices=store, single=True)
-    await StartAsyncTcpServer(context, address=(config.host, config.port))
+    identity = ModbusDeviceIdentification()
+    identity.VendorName = "Test Vendor"
+    identity.VendorUrl = "example.com"
+    identity.ProductCode = "Test Product Code"
+    identity.ProductName = "Test Product Name"
+    identity.ModelName = "Test Model"
+    identity.MajorMinorRevision = "1.0"
+    identity.UserApplicationName = "Test App"
+    await StartAsyncTcpServer(
+        context, address=(config.host, config.port), identity=identity
+    )
 
 
 @pytest.fixture(scope="session")

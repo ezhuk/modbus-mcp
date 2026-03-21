@@ -7,12 +7,25 @@ from starlette.requests import Request
 
 @pytest.mark.asyncio
 async def test_read_registers(server, mcp, client):
-    """Test read_registers resource."""
+    """Test read_registers resource and tool."""
     result = await client.read_resource(
         AnyUrl(f"tcp://{server.host}:{server.port}/40010?count=1&unit=1")
     )
     assert len(result) == 1
     assert result[0].text == "10"
+
+    result = await client.call_tool(
+        "read_registers",
+        {
+            "host": server.host,
+            "port": server.port,
+            "address": 40010,
+            "count": 1,
+            "unit": 1,
+        },
+    )
+    assert len(result.content) == 1
+    assert result.content[0].text == "10"
 
     with pytest.raises(McpError) as e:
         await client.read_resource(AnyUrl("tcp://none:502/40010?count=1&unit=1"))
@@ -79,6 +92,23 @@ async def test_mask_write_register(server, mcp, client):
             },
         )
     assert "Error calling tool" in str(e.value)
+
+
+@pytest.mark.asyncio
+async def test_read_information(server, mcp, client):
+    """Test read_information tool."""
+    result = await client.call_tool(
+        "read_information",
+        {
+            "code": 1,
+            "object_id": 0,
+            "host": server.host,
+            "port": server.port,
+            "unit": 1,
+        },
+    )
+    assert len(result.content) == 1
+    assert "Test Vendor" in result.content[0].text
 
 
 @pytest.mark.asyncio
