@@ -70,6 +70,15 @@ class ModbusMCP(FastMCP):
             },
         )
 
+        self.tool(
+            self.read_information,
+            annotations={
+                "title": "Read Information",
+                "readOnlyHint": True,
+                "openWorldHint": True,
+            },
+        )
+
         self.prompt(self.modbus_error, name="modbus_error", tags={"modbus", "error"})
         self.prompt(self.modbus_help, name="modbus_help", tags={"modbus", "help"})
 
@@ -147,6 +156,30 @@ class ModbusMCP(FastMCP):
                 return f"Mask write to {address} on {host}:{port} has succedeed"
         except Exception as e:
             raise RuntimeError(f"{e}") from e
+
+    async def read_information(
+        self,
+        code: int = 1,
+        object_id: int = 0,
+        name: str | None = None,
+        host: str | None = None,
+        port: int | None = None,
+        unit: int | None = None,
+    ) -> str:
+        """Reads device information from a remote unit."""
+        try:
+            host, port, unit = get_device(settings, name, host, port, unit)
+            async with AsyncModbusTcpClient(host, port=port) as client:
+                res = await client.read_device_information(
+                    read_code=code,
+                    object_id=object_id,
+                    device_id=unit,
+                )
+                return str(res.information)
+        except Exception as e:
+            raise RuntimeError(
+                f"Could not read {object_id} ({code}) from {host}:{port}"
+            ) from e
 
     def modbus_help(self) -> list[Message]:
         """Provides examples of how to use the Modbus MCP server."""
