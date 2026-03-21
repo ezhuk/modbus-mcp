@@ -79,6 +79,15 @@ class ModbusMCP(FastMCP):
             },
         )
 
+        self.tool(
+            self.read_exception,
+            annotations={
+                "title": "Read Exception Status",
+                "readOnlyHint": True,
+                "openWorldHint": True,
+            },
+        )
+
         self.prompt(self.modbus_error, name="modbus_error", tags={"modbus", "error"})
         self.prompt(self.modbus_help, name="modbus_help", tags={"modbus", "help"})
 
@@ -180,6 +189,22 @@ class ModbusMCP(FastMCP):
             raise RuntimeError(
                 f"Could not read {object_id} ({code}) from {host}:{port}"
             ) from e
+
+    async def read_exception(
+        self,
+        name: str | None = None,
+        host: str | None = None,
+        port: int | None = None,
+        unit: int | None = None,
+    ) -> str:
+        """Reads exception status from a remote unit."""
+        try:
+            host, port, unit = get_device(settings, name, host, port, unit)
+            async with AsyncModbusTcpClient(host, port=port) as client:
+                res = await client.read_exception_status(device_id=unit)
+                return str(res)
+        except Exception as e:
+            raise RuntimeError(f"Could not read from {host}:{port}") from e
 
     def modbus_help(self) -> list[Message]:
         """Provides examples of how to use the Modbus MCP server."""

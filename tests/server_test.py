@@ -112,6 +112,21 @@ async def test_read_information(server, mcp, client):
 
 
 @pytest.mark.asyncio
+async def test_read_exception(server, mcp, client):
+    """Test read_exception tool."""
+    result = await client.call_tool(
+        "read_exception",
+        {
+            "host": server.host,
+            "port": server.port,
+            "unit": 1,
+        },
+    )
+    assert len(result.content) == 1
+    assert result.content[0].text
+
+
+@pytest.mark.asyncio
 async def test_help_prompt(mcp, client):
     """Test help prompt."""
     result = await client.get_prompt("modbus_help", {})
