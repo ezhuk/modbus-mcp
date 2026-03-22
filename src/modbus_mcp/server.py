@@ -169,12 +169,12 @@ class ModbusMCP(FastMCP):
                     values=write_data,
                     device_id=unit,
                 )
-                if res.isError():
-                    raise RuntimeError(f"Could not read/write from/to {host}:{port}")
                 out = getattr(res, "registers", []) or getattr(res, "bits", [])
                 return ",".join(str(x) for x in out) if read_count > 1 else str(out[0])
         except Exception as e:
-            raise RuntimeError(f"{e}") from e
+            raise RuntimeError(
+                f"Could not read/write from/to {host}:{port} ({e})"
+            ) from e
 
     async def mask_write_register(
         self,
