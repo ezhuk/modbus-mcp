@@ -65,10 +65,23 @@ async def test_write_coils(server, mcp, client):
         await client.call_tool(
             "write_coils",
             {
+                "address": 1000,
+                "data": [1, 0],
+                "host": server.host,
+                "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "write_coils",
+            {
                 "address": 1,
                 "data": [1, 0],
                 "host": "none",
-                "port": 502,
+                "port": server.port,
                 "unit": 1,
             },
         )
@@ -96,7 +109,7 @@ async def test_write_registers(server, mcp, client):
             "write_registers",
             {
                 "host": "none",
-                "port": 502,
+                "port": server.port,
                 "address": 40001,
                 "data": [565],
                 "unit": 1,
@@ -161,7 +174,7 @@ async def test_mask_write_register(server, mcp, client):
             "mask_write_register",
             {
                 "host": "none",
-                "port": 502,
+                "port": server.port,
                 "address": 40001,
                 "and_mask": 0xFFFF,
                 "or_mask": 0x0000,
