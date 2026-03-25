@@ -53,6 +53,15 @@ class ModbusMCP(FastMCP):
         )
 
         self.tool(
+            self.write_coil,
+            annotations={
+                "title": "Write Coil",
+                "readOnlyHint": False,
+                "openWorldHint": True,
+            },
+        )
+
+        self.tool(
             self.write_coils,
             annotations={
                 "title": "Write Coils",
@@ -133,6 +142,30 @@ class ModbusMCP(FastMCP):
             raise RuntimeError(
                 f"Could not read {address} ({count}) from {host}:{port}"
             ) from e
+
+    async def write_coil(
+        self,
+        data: bool | int,
+        address: int = 1,
+        name: str | None = None,
+        host: str | None = None,
+        port: int | None = None,
+        unit: int | None = None,
+    ) -> str:
+        """Writes data to a single coil on a remote unit."""
+        try:
+            host, port, unit = get_device(settings, name, host, port, unit)
+            async with AsyncModbusTcpClient(host, port=port) as client:
+                res = await client.write_coil(
+                    address=address - 1,
+                    value=data,
+                    device_id=unit,
+                )
+                if res.isError():
+                    raise RuntimeError(f"Could not write to {address} on {host}:{port}")
+                return f"Write to {address} on {host}:{port} has succedeed"
+        except Exception as e:
+            raise RuntimeError(f"{e}") from e
 
     async def write_coils(
         self,
