@@ -132,6 +132,49 @@ async def test_write_coils(server, mcp, client):
 
 
 @pytest.mark.asyncio
+async def test_write_register(server, mcp, client):
+    """Test write_register tool."""
+    result = await client.call_tool(
+        "write_register",
+        {
+            "data": 565,
+            "address": 40001,
+            "host": server.host,
+            "port": server.port,
+            "unit": 1,
+        },
+    )
+    assert len(result.content) == 1
+    assert "succedeed" in result.content[0].text
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "write_register",
+            {
+                "data": 565,
+                "address": 41001,
+                "host": server.host,
+                "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "write_register",
+            {
+                "data": 565,
+                "address": 40001,
+                "host": "none",
+                "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
+
+
+@pytest.mark.asyncio
 async def test_write_registers(server, mcp, client):
     """Test write_registers tool."""
     result = await client.call_tool(
@@ -146,6 +189,19 @@ async def test_write_registers(server, mcp, client):
     )
     assert len(result.content) == 1
     assert "succedeed" in result.content[0].text
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "write_registers",
+            {
+                "host": server.host,
+                "port": server.port,
+                "address": 41001,
+                "data": [565],
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
 
     with pytest.raises(ToolError) as e:
         await client.call_tool(

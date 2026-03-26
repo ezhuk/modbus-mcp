@@ -71,6 +71,15 @@ class ModbusMCP(FastMCP):
         )
 
         self.tool(
+            self.write_register,
+            annotations={
+                "title": "Write Register",
+                "readOnlyHint": False,
+                "openWorldHint": True,
+            },
+        )
+
+        self.tool(
             self.write_registers,
             annotations={
                 "title": "Write Registers",
@@ -183,6 +192,30 @@ class ModbusMCP(FastMCP):
                 res = await client.write_coils(
                     address=address - 1,
                     values=data,
+                    device_id=unit,
+                )
+                if res.isError():
+                    raise RuntimeError(f"Could not write to {address} on {host}:{port}")
+                return f"Write to {address} on {host}:{port} has succedeed"
+        except Exception as e:
+            raise RuntimeError(f"{e}") from e
+
+    async def write_register(
+        self,
+        data: int,
+        address: int = 40001,
+        name: str | None = None,
+        host: str | None = None,
+        port: int | None = None,
+        unit: int | None = None,
+    ) -> str:
+        """Writes data to a single register on a remote unit."""
+        try:
+            host, port, unit = get_device(settings, name, host, port, unit)
+            async with AsyncModbusTcpClient(host, port=port) as client:
+                res = await client.write_register(
+                    address=address - 40001,
+                    value=data,
                     device_id=unit,
                 )
                 if res.isError():
