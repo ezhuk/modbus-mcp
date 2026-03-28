@@ -6,6 +6,49 @@ from starlette.requests import Request
 
 
 @pytest.mark.asyncio
+async def test_read_coils(server, mcp, client):
+    """Test read_coils tool."""
+    result = await client.call_tool(
+        "read_coils",
+        {
+            "address": 1,
+            "count": 3,
+            "host": server.host,
+            "port": server.port,
+            "unit": 1,
+        },
+    )
+    assert len(result.content) == 1
+    assert result.content[0].text == "False,True,False"
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "read_coils",
+            {
+                "address": 1001,
+                "count": 1,
+                "host": server.host,
+                "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "read_coils",
+            {
+                "address": 1,
+                "count": 1,
+                "host": "none",
+                "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
+
+
+@pytest.mark.asyncio
 async def test_read_registers(server, mcp, client):
     """Test read_registers resource and tool."""
     result = await client.read_resource(
@@ -16,15 +59,15 @@ async def test_read_registers(server, mcp, client):
 
     with pytest.raises(McpError) as e:
         await client.read_resource(AnyUrl("tcp://none:502/40010?count=1&unit=1"))
-    assert "Could not read" in str(e.value)
+    assert "Error reading resource" in str(e.value)
 
     result = await client.call_tool(
         "read_registers",
         {
-            "host": server.host,
-            "port": server.port,
             "address": 40010,
             "count": 1,
+            "host": server.host,
+            "port": server.port,
             "unit": 1,
         },
     )
@@ -35,10 +78,23 @@ async def test_read_registers(server, mcp, client):
         await client.call_tool(
             "read_registers",
             {
-                "host": "none",
+                "address": 41010,
+                "count": 1,
+                "host": server.host,
                 "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "read_registers",
+            {
                 "address": 40010,
                 "count": 1,
+                "host": "none",
+                "port": server.port,
                 "unit": 1,
             },
         )
