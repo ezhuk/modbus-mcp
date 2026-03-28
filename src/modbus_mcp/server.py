@@ -53,6 +53,15 @@ class ModbusMCP(FastMCP):
         )
 
         self.tool(
+            self.read_discrete_inputs,
+            annotations={
+                "title": "Read Discrete Inputs",
+                "readOnlyHint": True,
+                "openWorldHint": True,
+            },
+        )
+
+        self.tool(
             self.read_registers,
             annotations={
                 "title": "Read Registers",
@@ -153,6 +162,35 @@ class ModbusMCP(FastMCP):
             async with AsyncModbusTcpClient(host, port=port) as client:
                 res = await client.read_coils(
                     address=address - 1,
+                    count=count,
+                    device_id=unit,
+                )
+                if res.isError():
+                    raise RuntimeError(
+                        f"Could not read {address} ({count}) from {host}:{port}"
+                    )
+                out = getattr(res, "bits", [])
+                return (
+                    ",".join(str(x) for x in out[:count]) if count > 1 else str(out[0])
+                )
+        except Exception as e:
+            raise RuntimeError(f"{e}") from e
+
+    async def read_discrete_inputs(
+        self,
+        address: int = 10001,
+        count: int = 1,
+        name: str | None = None,
+        host: str | None = None,
+        port: int | None = None,
+        unit: int | None = None,
+    ) -> str:
+        """Reads one or more discrete inputs on a remote unit."""
+        try:
+            host, port, unit = get_device(settings, name, host, port, unit)
+            async with AsyncModbusTcpClient(host, port=port) as client:
+                res = await client.read_discrete_inputs(
+                    address=address - 10001,
                     count=count,
                     device_id=unit,
                 )
