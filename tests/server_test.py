@@ -64,10 +64,10 @@ async def test_read_registers(server, mcp, client):
     result = await client.call_tool(
         "read_registers",
         {
-            "host": server.host,
-            "port": server.port,
             "address": 40010,
             "count": 1,
+            "host": server.host,
+            "port": server.port,
             "unit": 1,
         },
     )
@@ -78,10 +78,23 @@ async def test_read_registers(server, mcp, client):
         await client.call_tool(
             "read_registers",
             {
-                "host": "none",
+                "address": 41010,
+                "count": 1,
+                "host": server.host,
                 "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "read_registers",
+            {
                 "address": 40010,
                 "count": 1,
+                "host": "none",
+                "port": server.port,
                 "unit": 1,
             },
         )
