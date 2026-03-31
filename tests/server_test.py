@@ -49,6 +49,49 @@ async def test_read_coils(server, mcp, client):
 
 
 @pytest.mark.asyncio
+async def test_discrete_inputs(server, mcp, client):
+    """Test read_discrete_inputs tool."""
+    result = await client.call_tool(
+        "read_discrete_inputs",
+        {
+            "address": 10001,
+            "count": 3,
+            "host": server.host,
+            "port": server.port,
+            "unit": 1,
+        },
+    )
+    assert len(result.content) == 1
+    assert result.content[0].text == "True,False,True"
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "read_discrete_inputs",
+            {
+                "address": 11001,
+                "count": 1,
+                "host": server.host,
+                "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
+
+    with pytest.raises(ToolError) as e:
+        await client.call_tool(
+            "read_discrete_inputs",
+            {
+                "address": 10001,
+                "count": 1,
+                "host": "none",
+                "port": server.port,
+                "unit": 1,
+            },
+        )
+    assert "Error calling tool" in str(e.value)
+
+
+@pytest.mark.asyncio
 async def test_read_registers(server, mcp, client):
     """Test read_registers resource and tool."""
     result = await client.read_resource(
