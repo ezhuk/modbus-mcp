@@ -5,7 +5,7 @@ description = "OpenAI Agents MCP example"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "openai-agents>=0.1.0",
+    "openai-agents>=0.15.0",
 ]
 
 [dependency-groups]
