@@ -1,5 +1,4 @@
 from fastmcp import FastMCP
-from fastmcp.server.auth.providers.workos import AuthKitProvider
 from fastmcp.prompts.prompt import Message
 from fastmcp.resources import ResourceTemplate
 from pymodbus.client import AsyncModbusTcpClient
@@ -9,8 +8,6 @@ from starlette.responses import JSONResponse
 from modbus_mcp.settings import Settings
 from modbus_mcp.utils import get_device
 
-
-settings = Settings()
 
 _READ_FN = {
     0: ("read_coils", 1),
@@ -24,15 +21,20 @@ _WRITE_FN = {0: ("write_coils", 1), 4: ("write_registers", 40001)}
 
 class ModbusMCP(FastMCP):
     def __init__(self, **kwargs):
+        self.settings = Settings()
+
+        auth = None
+        if self.settings.auth.domain and self.settings.auth.url:
+            from fastmcp.server.auth.providers.workos import AuthKitProvider
+
+            auth = AuthKitProvider(
+                authkit_domain=self.settings.auth.domain,
+                base_url=self.settings.auth.url,
+            )
+
         super().__init__(
             name="Modbus MCP Server",
-            auth=(
-                AuthKitProvider(
-                    authkit_domain=settings.auth.domain, base_url=settings.auth.url
-                )
-                if settings.auth.domain and settings.auth.url
-                else None
-            ),
+            auth=auth,
             **kwargs,
         )
 
@@ -158,7 +160,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Reads one or more coils on a remote unit."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 res = await client.read_coils(
                     address=address - 1,
@@ -187,7 +189,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Reads one or more discrete inputs on a remote unit."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 res = await client.read_discrete_inputs(
                     address=address - 10001,
@@ -216,7 +218,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Reads the contents of one or more registers on a remote unit."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 func, offset = _READ_FN[address // 10000]
                 method = getattr(client, func)
@@ -241,7 +243,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Writes data to a single coil on a remote unit."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 res = await client.write_coil(
                     address=address - 1,
@@ -265,7 +267,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Writes data to one or more coils on a remote unit."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 res = await client.write_coils(
                     address=address - 1,
@@ -289,7 +291,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Writes data to a single register on a remote unit."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 res = await client.write_register(
                     address=address - 40001,
@@ -313,7 +315,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Writes data to one or more registers on a remote unit."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 func, offset = _WRITE_FN[address // 10000]
                 method = getattr(client, func)
@@ -337,7 +339,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Reads and writes data from/to one or more registers on a remote unit."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 res = await client.readwrite_registers(
                     read_address=read_address - _READ_FN[read_address // 10000][1],
@@ -365,7 +367,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Mask writes data to a specified register."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 res = await client.mask_write_register(
                     address=(address - 40001),
@@ -392,7 +394,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Reads device information from a remote unit."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 res = await client.read_device_information(
                     read_code=code,
@@ -414,7 +416,7 @@ class ModbusMCP(FastMCP):
     ) -> str:
         """Reads exception status from a remote unit."""
         try:
-            host, port, unit = get_device(settings, name, host, port, unit)
+            host, port, unit = get_device(self.settings, name, host, port, unit)
             async with AsyncModbusTcpClient(host, port=port) as client:
                 res = await client.read_exception_status(device_id=unit)
                 return str(res)
