@@ -7,7 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "fastmcp>=3.0.0",
     "pydantic-settings>=2.10.0",
-    "pymodbus>=3.10.0,<3.13.0",
+    "pymodbus>=3.10.0,<3.14.0",
     "typer>=0.16.0",
 ]
 
