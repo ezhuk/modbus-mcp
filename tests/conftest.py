@@ -25,10 +25,10 @@ class Config(BaseModel):
 async def _server_main(config: Config) -> None:
     count = 100
     store = ModbusDeviceContext(
-        di=ModbusSequentialDataBlock(0, [x % 2 == 1 for x in range(count)]),
-        co=ModbusSequentialDataBlock(0, [x % 2 == 0 for x in range(count)]),
-        hr=ModbusSequentialDataBlock(0, list(range(0, count))),
-        ir=ModbusSequentialDataBlock(0, list(range(0, count))),
+        di=ModbusSequentialDataBlock(1, [x % 2 == 0 for x in range(count)]),
+        co=ModbusSequentialDataBlock(1, [x % 2 == 1 for x in range(count)]),
+        hr=ModbusSequentialDataBlock(1, list(range(1, count + 1))),
+        ir=ModbusSequentialDataBlock(1, list(range(1, count + 1))),
     )
     context = ModbusServerContext(devices=store, single=True)
     identity = ModbusDeviceIdentification()
