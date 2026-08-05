@@ -17,9 +17,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version-file: .python-version
       - run: |
@@ -29,6 +29,6 @@ jobs:
           uv run pytest --cov=modbus_mcp --cov-report=xml
         env:
           MODBUS_MCP_MODBUS__PORT: 5020
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           use_oidc: true
