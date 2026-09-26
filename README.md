@@ -80,7 +80,7 @@ npx @modelcontextprotocol/inspector
 
 ## Core Concepts
 
-The Modbus MCP server is built with [FastMCP 2.0](https://github.com/jlowin/fastmcp) and leverages its core building blocks - resource templates, tools, and prompts - to streamline Modbus read and write operations with minimal boilerplate and a clean, Pythonic interface.
+The Modbus MCP server is built with [FastMCP](https://github.com/jlowin/fastmcp) and leverages its core building blocks - resource templates, tools, and prompts - to streamline Modbus read and write operations with minimal boilerplate and a clean, Pythonic interface.
 
 ### Read Registers
 
