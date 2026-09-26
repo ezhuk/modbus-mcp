@@ -1,5 +1,5 @@
 from fastmcp import FastMCP
-from fastmcp.prompts.prompt import Message
+from fastmcp.prompts import Message
 from fastmcp.resources import ResourceTemplate
 from pymodbus.client import AsyncModbusTcpClient
 from starlette.requests import Request
@@ -7,7 +7,6 @@ from starlette.responses import JSONResponse
 
 from modbus_mcp.settings import Settings
 from modbus_mcp.utils import get_device
-
 
 _READ_FN = {
     0: ("read_coils", 1),

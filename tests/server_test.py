@@ -1,5 +1,4 @@
 import pytest
-
 from fastmcp.exceptions import McpError, ToolError
 from pydantic import AnyUrl
 from starlette.requests import Request
