@@ -8,7 +8,6 @@ from starlette.responses import JSONResponse
 from modbus_mcp.settings import Settings
 from modbus_mcp.utils import get_device
 
-
 _READ_FN = {
     0: ("read_coils", 1),
     1: ("read_discrete_inputs", 10001),

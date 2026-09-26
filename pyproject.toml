@@ -27,3 +27,8 @@ dev = [
     "ruff>=0.12.0",
     "ty>=0.0.83",
 ]
+
+[tool.ty.src]
+exclude = [
+    "examples",
+]

@@ -1,8 +1,8 @@
 import asyncio
+
 import typer
 
 from modbus_mcp.server import ModbusMCP
-
 
 app = typer.Typer(
     name="modbus-mcp",
