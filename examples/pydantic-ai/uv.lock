@@ -891,7 +891,7 @@ wheels = [
 
 [[package]]
 name = "modbus-mcp"
-version = "0.3.3"
+version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fastmcp" },
@@ -899,9 +899,9 @@ dependencies = [
     { name = "pymodbus" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/70/a6/59ab855928d66c7a6a5ba95a8a36b9eb081c4f0ea33bf27b6d2e2e6e6acc/modbus_mcp-0.3.3.tar.gz", hash = "sha256:695640197651c1da7dd5e365d1a97537892bea9970eed348472bfa8f989c07f0", size = 276823, upload-time = "2026-07-17T00:31:15.823Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/49/de/132e81808b264367013fffc42731d4edd3a15e391f4f91fad8de3881bb76/modbus_mcp-0.4.0.tar.gz", hash = "sha256:84048399bff0d661d127084a10bfd1df4c0767769bf02700b2667f3809c89244", size = 6487, upload-time = "2026-09-26T21:33:00.049Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5b/d1/a1e3582afb0906fafa235d9f85f5cb293bbae98fd5d449df52fe5854d18d/modbus_mcp-0.3.3-py3-none-any.whl", hash = "sha256:50630fe9d013f9525208a5d34fe1f240e4d99ee62251ffcac09a936e42fe2903", size = 9082, upload-time = "2026-07-17T00:31:14.461Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/ba/d78cd9e4e75f4733275809b062e69744d9e488bd5e1787a0a304331e1dbc/modbus_mcp-0.4.0-py3-none-any.whl", hash = "sha256:532b9721a2c6536971ccd1d936db9e392eed5b10e27727c134c26b56d033e363", size = 8345, upload-time = "2026-09-26T21:32:58.732Z" },
 ]
 
 [[package]]
