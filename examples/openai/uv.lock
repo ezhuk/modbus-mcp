@@ -745,7 +745,7 @@ wheels = [
 
 [[package]]
 name = "modbus-mcp"
-version = "0.3.3"
+version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fastmcp" },
@@ -753,9 +753,9 @@ dependencies = [
     { name = "pymodbus" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/70/a6/59ab855928d66c7a6a5ba95a8a36b9eb081c4f0ea33bf27b6d2e2e6e6acc/modbus_mcp-0.3.3.tar.gz", hash = "sha256:695640197651c1da7dd5e365d1a97537892bea9970eed348472bfa8f989c07f0", size = 276823, upload-time = "2026-07-17T00:31:15.823Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/49/de/132e81808b264367013fffc42731d4edd3a15e391f4f91fad8de3881bb76/modbus_mcp-0.4.0.tar.gz", hash = "sha256:84048399bff0d661d127084a10bfd1df4c0767769bf02700b2667f3809c89244", size = 6487, upload-time = "2026-09-26T21:33:00.049Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5b/d1/a1e3582afb0906fafa235d9f85f5cb293bbae98fd5d449df52fe5854d18d/modbus_mcp-0.3.3-py3-none-any.whl", hash = "sha256:50630fe9d013f9525208a5d34fe1f240e4d99ee62251ffcac09a936e42fe2903", size = 9082, upload-time = "2026-07-17T00:31:14.461Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/ba/d78cd9e4e75f4733275809b062e69744d9e488bd5e1787a0a304331e1dbc/modbus_mcp-0.4.0-py3-none-any.whl", hash = "sha256:532b9721a2c6536971ccd1d936db9e392eed5b10e27727c134c26b56d033e363", size = 8345, upload-time = "2026-09-26T21:32:58.732Z" },
 ]
 
 [[package]]
@@ -778,7 +778,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "3.19.2"
+version = "3.20.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -788,9 +788,9 @@ dependencies = [
     { name = "sniffio" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7c/91/2d5722388a50cc86e162779df5fbfe0afa652a6e2d5c9ee616e081a82098/openai-3.19.2.tar.gz", hash = "sha256:de185f9834ad064d965ec42bd0766731cf66bceea16a7670294a835d207019e6", size = 1716953, upload-time = "2026-09-24T00:06:07.315Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/99/9a/008ff67f5f39ff680b7c9adf38373779247c365c611b9c60302e2dc65eea/openai-3.20.0.tar.gz", hash = "sha256:5e5dc0a3c0a9362e69cd35a65d04580a73a66eb39d5abeb78881b6190ca5d98c", size = 1746517, upload-time = "2026-09-28T16:05:03.22Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/20/4fe123e60525375878c67d1d8d051c9c5dec81cc56a579ba9304ca743303/openai-3.19.2-py3-none-any.whl", hash = "sha256:66247fcd07266e72536e90656dc27f3b0bb1e9d8696d4013fc55402c0b96a5c2", size = 2071459, upload-time = "2026-09-24T00:06:05.416Z" },
+    { url = "https://files.pythonhosted.org/packages/ac/92/218ff62ff1ae4eb737bdd011a20ca2f0f48a313893cc45190819468ba4e1/openai-3.20.0-py3-none-any.whl", hash = "sha256:fb1b109e3423ed51c6ade96bbb0fffddae39c8e64bb9b6e501659bcbaa5ad30c", size = 2082957, upload-time = "2026-09-28T16:05:00.823Z" },
 ]
 
 [[package]]
